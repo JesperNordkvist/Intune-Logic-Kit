@@ -6,6 +6,9 @@ function Add-LKPolicyAssignment {
         Get-LKPolicy -Name "XW365 - TestConfig" | Add-LKPolicyAssignment -GroupName 'SG-Intune-TestDevices'
     .EXAMPLE
         Add-LKPolicyAssignment -GroupName 'TestDevices' -PolicyId 'abc-123' -PolicyType SettingsCatalog
+    .EXAMPLE
+        Get-LKPolicy -Name "Google Chrome" -PolicyType App | Add-LKPolicyAssignment -GroupName 'All Users' -Intent Required
+        Assigns an app as Required to a group.
     #>
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High', DefaultParameterSetName = 'ByName')]
     param(
@@ -43,7 +46,10 @@ function Add-LKPolicyAssignment {
             'GroupPolicyConfiguration', 'PlatformScript', 'Remediation',
             'DriverUpdate', 'App'
         )]
-        [string[]]$SearchPolicyType
+        [string[]]$SearchPolicyType,
+
+        [ValidateSet('Required', 'Available', 'Uninstall')]
+        [string]$Intent
     )
 
     begin {
@@ -65,9 +71,10 @@ function Add-LKPolicyAssignment {
     process {
         if ($PSCmdlet.ParameterSetName -eq 'ByName') {
             foreach ($pol in $resolvedPolicies) {
-                $confirmParam = @{}
-                if ($PSBoundParameters.ContainsKey('Confirm')) { $confirmParam['Confirm'] = $PSBoundParameters['Confirm'] }
-                Add-LKPolicyAssignment -InputObject $pol -GroupName $GroupName @confirmParam
+                $passThrough = @{}
+                if ($PSBoundParameters.ContainsKey('Confirm')) { $passThrough['Confirm'] = $PSBoundParameters['Confirm'] }
+                if ($Intent) { $passThrough['Intent'] = $Intent }
+                Add-LKPolicyAssignment -InputObject $pol -GroupName $GroupName @passThrough
             }
             return
         }
@@ -117,18 +124,22 @@ function Add-LKPolicyAssignment {
             return
         }
 
+        $intentLabel = if ($Intent) { " ($Intent)" } else { '' }
         Write-LKActionSummary -Action 'ADD ASSIGNMENT' -Details ([ordered]@{
             Policy = "$name ($($typeEntry.DisplayName))"
-            Group  = "$GroupName (Include)"
+            Group  = "$GroupName (Include)$intentLabel"
             Scope  = "Policy=$policyScope, Group=$groupScope"
         })
 
-        if ($PSCmdlet.ShouldProcess("$name ($($typeEntry.DisplayName))", "Add include assignment for '$GroupName'")) {
+        if ($PSCmdlet.ShouldProcess("$name ($($typeEntry.DisplayName))", "Add include assignment for '$GroupName'$intentLabel")) {
             $newAssignment = @{
                 target = @{
                     '@odata.type' = '#microsoft.graph.groupAssignmentTarget'
                     groupId       = $groupId
                 }
+            }
+            if ($Intent) {
+                $newAssignment['intent'] = $Intent.ToLower()
             }
 
             $updatedAssignments = @($assignments) + @($newAssignment)

@@ -110,6 +110,7 @@ function Get-LKPolicyOverview {
             $assignments += @{
                 Type      = $assignmentType
                 GroupName = $groupName
+                Intent    = $a.intent
             }
         }
 
@@ -161,6 +162,16 @@ function Get-LKPolicyOverview {
                     'AllLicensedUsers' { 'Cyan' }
                     'Include'          { 'Gray' }
                     default            { 'DarkGray' }
+                }
+                # Append intent label for app assignments (Required/Available/Uninstall)
+                if ($a.Intent) {
+                    $intentLabel = switch ($a.Intent) {
+                        'required'  { 'Required' }
+                        'available' { 'Available' }
+                        'uninstall' { 'Uninstall' }
+                        default     { $a.Intent }
+                    }
+                    $label = "$label ($intentLabel)"
                 }
                 Write-Host "    $label" -ForegroundColor $color
             }

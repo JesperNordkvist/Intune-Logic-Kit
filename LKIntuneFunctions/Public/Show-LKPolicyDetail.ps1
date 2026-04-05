@@ -105,12 +105,12 @@ function Show-LKPolicyDetail {
                 $target = $a.target
                 if (-not $target) { continue }
                 $aType = switch -Wildcard ($target.'@odata.type') {
-                    '*exclusionGroupAssignmentTarget' { 'Exclude' }
-                    '*groupAssignmentTarget'          { 'Include' }
-                    '*allDevicesAssignmentTarget'      { 'All Devices' }
-                    '*allUsersAssignmentTarget'        { 'All Users' }
-                    '*allLicensedUsersAssignmentTarget' { 'All Licensed Users' }
-                    default                            { 'Unknown' }
+                    '*exclusionGroupAssignmentTarget'   { 'Exclude'; break }
+                    '*groupAssignmentTarget'            { 'Include'; break }
+                    '*allDevicesAssignmentTarget'        { 'All Devices'; break }
+                    '*allUsersAssignmentTarget'          { 'All Users'; break }
+                    '*allLicensedUsersAssignmentTarget'  { 'All Licensed Users'; break }
+                    default                              { 'Unknown' }
                 }
                 $gName = $target.groupId
                 if ($target.groupId) {
@@ -119,7 +119,9 @@ function Show-LKPolicyDetail {
                         $gName = $grp.displayName
                     } catch { }
                 }
-                $assignments += @{ Type = $aType; Target = $gName }
+                # Capture intent (Required/Available/Uninstall) for app assignments
+                $intent = $a.intent
+                $assignments += @{ Type = $aType; Target = $gName; Intent = $intent }
             }
         } catch {
             Write-Verbose "Failed to fetch assignments: $($_.Exception.Message)"
@@ -163,7 +165,18 @@ function Show-LKPolicyDetail {
                     default   { 'White' }
                 }
                 Write-Host "    [$($a.Type)]" -ForegroundColor $color -NoNewline
-                Write-Host " $($a.Target)" -ForegroundColor White
+                Write-Host " $($a.Target)" -ForegroundColor White -NoNewline
+                if ($a.Intent) {
+                    $intentLabel = switch ($a.Intent) {
+                        'required'      { 'Required' }
+                        'available'     { 'Available' }
+                        'uninstall'     { 'Uninstall' }
+                        default         { $a.Intent }
+                    }
+                    Write-Host " ($intentLabel)" -ForegroundColor DarkYellow
+                } else {
+                    Write-Host ''
+                }
             }
         }
 

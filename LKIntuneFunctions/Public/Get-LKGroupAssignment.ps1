@@ -176,6 +176,7 @@ function Get-LKGroupAssignment {
                             AssignmentType = 'Exclude'
                             GroupId        = $target.groupId
                             GroupName      = $targetLookup[$target.groupId]
+                            Intent         = $assignment.intent
                         }
                     }
                     continue
@@ -187,6 +188,7 @@ function Get-LKGroupAssignment {
                         AssignmentType = 'Include'
                         GroupId        = $target.groupId
                         GroupName      = $targetLookup[$target.groupId]
+                        Intent         = $assignment.intent
                     }
                     continue
                 }
@@ -199,7 +201,7 @@ function Get-LKGroupAssignment {
                     default                             { $null }
                 }
                 if ($broadType) {
-                    $broadTargets += $broadType
+                    $broadTargets += @{ Type = $broadType; Intent = $assignment.intent }
                 }
             }
 
@@ -234,6 +236,7 @@ function Get-LKGroupAssignment {
                     GroupName      = $match.GroupName
                     GroupScope     = $gScope
                     ScopeMismatch  = $mismatch
+                    Intent         = $match.Intent
                 }
             }
 
@@ -253,7 +256,7 @@ function Get-LKGroupAssignment {
                     if ($gScope -eq 'Unknown') { continue }
 
                     foreach ($broad in $broadTargets) {
-                        $applies = switch ($broad) {
+                        $applies = switch ($broad.Type) {
                             'AllDevices' {
                                 $gScope -in @('Device', 'Both')
                             }
@@ -267,7 +270,7 @@ function Get-LKGroupAssignment {
 
                         if ($applies) {
                             # For broad targets, check mismatch between policy scope and the broad target's implied scope
-                            $broadImpliedScope = switch ($broad) {
+                            $broadImpliedScope = switch ($broad.Type) {
                                 'AllDevices'       { 'Device' }
                                 'AllUsers'         { 'User' }
                                 'AllLicensedUsers' { 'User' }
@@ -283,11 +286,12 @@ function Get-LKGroupAssignment {
                                 PolicyType     = $type.TypeName
                                 DisplayType    = $displayType
                                 PolicyScope    = $policyScope
-                                AssignmentType = $broad
+                                AssignmentType = $broad.Type
                                 GroupId        = $g.Id
                                 GroupName      = $targetLookup[$g.Id]
                                 GroupScope     = $gScope
                                 ScopeMismatch  = $mismatch
+                                Intent         = $broad.Intent
                             }
                             break
                         }

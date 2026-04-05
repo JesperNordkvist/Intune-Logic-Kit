@@ -13,7 +13,7 @@ function Set-LKRawAssignment {
     )
 
     if ($PolicyType.AssignmentMethod -eq 'GroupAssignments') {
-        # Scripts use the /assign action with a specific body format
+        # Scripts use the /assign action with BOTH assignment array formats
         $assignPath = "$($PolicyType.Endpoint)/$PolicyId/assign"
         $groupAssignments = @($Assignments | ForEach-Object {
             @{
@@ -22,9 +22,19 @@ function Set-LKRawAssignment {
                 targetGroupId = $_.target.groupId
             }
         })
+        $scriptAssignments = @($Assignments | ForEach-Object {
+            @{
+                '@odata.type' = '#microsoft.graph.deviceManagementScriptAssignment'
+                id            = "$PolicyId`_$($_.target.groupId)"
+                target        = @{
+                    '@odata.type' = '#microsoft.graph.groupAssignmentTarget'
+                    groupId       = $_.target.groupId
+                }
+            }
+        })
         $body = @{
             deviceManagementScriptGroupAssignments = $groupAssignments
-            deviceManagementScriptAssignments      = @()
+            deviceManagementScriptAssignments      = $scriptAssignments
         }
         Invoke-LKGraphRequest -Method POST -Uri $assignPath -ApiVersion $PolicyType.ApiVersion -Body $body | Out-Null
         return

@@ -1,8 +1,9 @@
 function Resolve-LKPolicyScope {
     <#
     .SYNOPSIS
-        Determines the effective user/device scope of a policy via Graph metadata.
-        Falls back to the registry's static scope when runtime signals are unavailable.
+        Determines the effective assignment scope (User/Device/Both) of a policy.
+        This reflects which group types a policy can validly be assigned to,
+        not the CSP scope (HKLM vs HKCU) of its underlying settings.
     #>
     [CmdletBinding()]
     param(
@@ -21,31 +22,12 @@ function Resolve-LKPolicyScope {
     switch ($PolicyType.TypeName) {
 
         'SettingsCatalog' {
-            # 1) Fetch first setting and inspect the settingDefinitionId prefix
-            #    This is the most reliable signal — definition IDs are prefixed with device_ or user_
-            #    Note: we check this BEFORE templateFamily because some endpoint security
-            #    templates (e.g. Personal Data Encryption) are user-scoped despite the family name
-            try {
-                $settingsResponse = Invoke-LKGraphRequest -Method GET `
-                    -Uri "/deviceManagement/configurationPolicies/$($RawPolicy.id)/settings?`$top=1" `
-                    -ApiVersion 'beta'
-                $settingsList = $settingsResponse.value
-                if ($settingsList -and $settingsList.Count -gt 0) {
-                    $defId = $settingsList[0].settingInstance.settingDefinitionId
-                    if ($defId -like 'device_*') { return 'Device' }
-                    if ($defId -like 'user_*')   { return 'User' }
-                }
-            } catch {
-                Write-Verbose "Resolve-LKPolicyScope: failed to fetch settings for SettingsCatalog policy $($RawPolicy.id): $($_.Exception.Message)"
-            }
-
-            # 2) Fallback: check templateFamily — most endpoint security templates are device-scoped
-            $family = $RawPolicy.templateReference.templateFamily
-            if ($family -and $family -ne 'none') {
-                if ($family -like 'endpointSecurity*') { return 'Device' }
-            }
-
-            return 'Both'
+            # Settings Catalog definition ID prefixes (device_ / user_) indicate CSP scope
+            # (HKLM vs HKCU), NOT assignment scope. Intune fully supports cross-scope:
+            #   - device_ CSP policies assigned to user groups (applies HKLM when user signs in)
+            #   - user_ CSP policies assigned to device groups (applies to all users on device)
+            # OIB deliberately assigns device_ CSP policies to user groups for Autopilot timing.
+            # Fall through to name-based heuristic.
         }
 
         'EndpointSecurity' {
@@ -97,16 +79,14 @@ function Resolve-LKPolicyScope {
             } catch {
                 Write-Verbose "Resolve-LKPolicyScope: failed to fetch definition values for ADMX policy $($RawPolicy.id): $($_.Exception.Message)"
             }
-
-            return 'Both'
+            # Fall through to name-based heuristic
         }
 
         'EnrollmentConfiguration' {
             $odataType = $RawPolicy.'@odata.type'
             if ($odataType -like '*Limit*')               { return 'User' }
             if ($odataType -like '*HelloForBusiness*')     { return 'User' }
-            if ($odataType -like '*PlatformRestriction*')  { return 'Both' }
-            return 'Both'
+            # Fall through to name-based heuristic
         }
 
         'DeviceConfiguration' {
@@ -122,9 +102,21 @@ function Resolve-LKPolicyScope {
             foreach ($pattern in $deviceOnly) {
                 if ($odataType -like $pattern) { return 'Device' }
             }
-            return 'Both'
+            # Fall through to name-based heuristic
         }
 
-        default { return 'Both' }
+        default { }  # Fall through to name-based heuristic below
     }
+
+    # Final fallback: infer scope from naming convention
+    # Common patterns: "- U -", "-U-", "- D -", "-D-", "- C -", "-C-"
+    #   U = User-scoped, D/C = Device-scoped (C = Computer)
+    $nameProp = $PolicyType.NameProperty
+    $policyName = $RawPolicy.$nameProp
+    if ($policyName) {
+        if ($policyName -match '[-–]\s*U\s*[-–]') { return 'User' }
+        if ($policyName -match '[-–]\s*[DC]\s*[-–]') { return 'Device' }
+    }
+
+    return 'Both'
 }
