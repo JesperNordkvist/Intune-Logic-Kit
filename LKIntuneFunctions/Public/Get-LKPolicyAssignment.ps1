@@ -90,13 +90,17 @@ function Get-LKPolicyAssignment {
                 } else {
                     try {
                         $grp = Invoke-LKGraphRequest -Method GET -Uri "/groups/$groupId`?`$select=displayName" -ApiVersion 'v1.0'
-                        $groupName = $grp.displayName
+                        $groupName = if ($grp.displayName) { $grp.displayName } else { $groupId }
                     } catch {
                         $groupName = $groupId
                     }
                     $groupNameCache[$groupId] = $groupName
                 }
             }
+
+            # Capture assignment filter info if present
+            $filterType = $target.deviceAndAppManagementAssignmentFilterType
+            $filterId   = $target.deviceAndAppManagementAssignmentFilterId
 
             [PSCustomObject]@{
                 PSTypeName     = 'LKPolicyAssignment'
@@ -106,6 +110,8 @@ function Get-LKPolicyAssignment {
                 AssignmentType = $assignmentType
                 GroupId        = $groupId
                 GroupName      = $groupName
+                FilterType     = $filterType
+                FilterId       = $filterId
                 Intent         = $assignment.intent
             }
         }
