@@ -33,6 +33,7 @@
         'Invoke-LKDeviceAction'
         'Show-LKPolicyDetail'
         'Test-LKPolicyAssignment'
+        'Get-LKPolicyOverview'
     )
     CmdletsToExport   = @()
     VariablesToExport  = @()
