@@ -1,14 +1,13 @@
 ---
 title: Get-LKDeviceDetail
-parent: Device Operations
-nav_order: 2
+nav_order: 8
 ---
 
 # Get-LKDeviceDetail
 Returns detailed information for a specific Intune managed device.
 
 ## Syntax
-```powershell
+```text
 # By name
 Get-LKDeviceDetail -Name <String> [<CommonParameters>]
 
@@ -22,22 +21,22 @@ Get-LKDeviceDetail [-InputObject <PSCustomObject>] [<CommonParameters>]
 ## Parameters
 
 ### -Name
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByName) |
 
 ### -DeviceId
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ById) |
 
 ### -InputObject
 A device object from `Get-LKDevice`. Accepted from the pipeline.
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ## Outputs
@@ -70,14 +69,14 @@ A device object from `Get-LKDevice`. Accepted from the pipeline.
 
 ## Examples
 
-### Example 1 --- By name
+### Example 1 - By name
 ```powershell
 Get-LKDeviceDetail -Name "YOURPC-001"
 ```
 
-### Example 2 --- Pipeline
+### Example 2 - Pipeline
 ```powershell
-Get-LKDevice -User "Jesper" | Get-LKDeviceDetail
+Get-LKDevice -User "John" | Get-LKDeviceDetail
 ```
 
 ## Related

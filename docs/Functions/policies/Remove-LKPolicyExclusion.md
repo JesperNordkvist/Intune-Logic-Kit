@@ -1,7 +1,6 @@
 ---
 title: Remove-LKPolicyExclusion
-parent: Policy Operations
-nav_order: 8
+nav_order: 23
 ---
 
 # Remove-LKPolicyExclusion
@@ -10,7 +9,7 @@ Removes a group exclusion from one or more Intune policies.
 
 ## Syntax
 
-```powershell
+```text
 # By name
 Remove-LKPolicyExclusion
     -GroupName <String>
@@ -44,23 +43,23 @@ Fetches current assignments, removes the matching exclusion, and writes back the
 
 ### -GroupName
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes |
 
 ### -PolicyName
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | Yes (ByName) |
 
 ### -NameMatch
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Default | Contains |
 | Valid values | Contains, Exact, Wildcard, Regex |
 
@@ -68,23 +67,23 @@ Fetches current assignments, removes the matching exclusion, and writes back the
 
 Remove the exclusion from all policies.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | SwitchParameter |
+| Type | `SwitchParameter` |
 
 ### -PolicyType
 
 Restrict to specific types when using `-All`.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 
 ### -InputObject
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ## Outputs
@@ -99,16 +98,16 @@ Restrict to specific types when using `-All`.
 
 ## Examples
 
-### Example 1 --- Remove from all policies
+### Example 1 - Remove from all policies
 
 ```powershell
 Remove-LKPolicyExclusion -GroupName 'SG-Intune-TestDevices' -All
 ```
 
-### Example 2 --- Pipeline
+### Example 2 - Pipeline
 
 ```powershell
-Get-LKPolicy -Name "XW365" | Remove-LKPolicyExclusion -GroupName 'TestGroup'
+Get-LKPolicy -Name "Contoso" | Remove-LKPolicyExclusion -GroupName 'TestGroup'
 ```
 
 ## Related

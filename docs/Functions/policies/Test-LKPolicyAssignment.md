@@ -1,16 +1,15 @@
 ---
 title: Test-LKPolicyAssignment
-parent: Policy Operations
-nav_order: 10
+nav_order: 27
 ---
 
 # Test-LKPolicyAssignment
 
-Audits Intune policies for scope mismatches --- device policies assigned to user groups or vice versa.
+Audits Intune policies for scope mismatches - device policies assigned to user groups or vice versa.
 
 ## Syntax
 
-```powershell
+```text
 Test-LKPolicyAssignment
     [-PolicyType <String[]>]
     [-Name <String[]>]
@@ -31,24 +30,24 @@ Group scope results are cached to avoid redundant API calls across policies that
 
 ### -PolicyType
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | No |
 | Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
 
 ### -Name
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | No |
 
 ### -NameMatch
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Default | Contains |
 | Valid values | Contains, Exact, Wildcard, Regex |
 
@@ -56,9 +55,9 @@ Group scope results are cached to avoid redundant API calls across policies that
 
 Shows a formatted, color-coded summary in the host. Mismatches in red, warnings in yellow.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | SwitchParameter |
+| Type | `SwitchParameter` |
 
 ## Outputs
 
@@ -79,25 +78,25 @@ Shows a formatted, color-coded summary in the host. Mismatches in red, warnings 
 
 ## Examples
 
-### Example 1 --- Full audit
+### Example 1 - Full audit
 
 ```powershell
 Test-LKPolicyAssignment -Detailed
 ```
 
-### Example 2 --- Filter by type
+### Example 2 - Filter by type
 
 ```powershell
 Test-LKPolicyAssignment -PolicyType SettingsCatalog, CompliancePolicy
 ```
 
-### Example 3 --- Programmatic filtering
+### Example 3 - Programmatic filtering
 
 ```powershell
 Test-LKPolicyAssignment | Where-Object Severity -eq 'Mismatch' | Format-Table PolicyName, PolicyScope, GroupName, GroupScope
 ```
 
-### Example 4 --- Remediate mismatches
+### Example 4 - Remediate mismatches
 
 ```powershell
 $mismatches = Test-LKPolicyAssignment | Where-Object Severity -eq 'Mismatch'

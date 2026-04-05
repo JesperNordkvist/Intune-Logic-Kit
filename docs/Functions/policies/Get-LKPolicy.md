@@ -1,7 +1,6 @@
 ---
 title: Get-LKPolicy
-parent: Policy Operations
-nav_order: 1
+nav_order: 12
 ---
 
 # Get-LKPolicy
@@ -10,7 +9,7 @@ Queries Intune policies across all or specific policy types with flexible name f
 
 ## Syntax
 
-```powershell
+```text
 Get-LKPolicy
     [-Name <String[]>]
     [-NameMatch <String>]
@@ -31,18 +30,18 @@ Searches across all 15 policy types (or a filtered subset) and returns unified p
 
 One or more name patterns to match against policy names.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | No |
 
 ### -NameMatch
 
 How `-Name` is matched. Default: `Contains`.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Default | Contains |
 | Valid values | Contains, Exact, Wildcard, Regex |
 
@@ -50,9 +49,9 @@ How `-Name` is matched. Default: `Contains`.
 
 Restrict the search to specific policy types. When omitted, all types are searched.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | No |
 | Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
 
@@ -60,25 +59,25 @@ Restrict the search to specific policy types. When omitted, all types are search
 
 Resolves the effective User/Device scope for each policy via Graph metadata instead of using the static registry default.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | SwitchParameter |
+| Type | `SwitchParameter` |
 
 ### -IncludeSettings
 
 Attaches the configured settings to each returned policy object as a `Settings` property.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | SwitchParameter |
+| Type | `SwitchParameter` |
 
 ### -FilterScript
 
 A script block for advanced client-side filtering on the returned objects.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | ScriptBlock |
+| Type | `ScriptBlock` |
 
 ## Outputs
 
@@ -97,25 +96,25 @@ A script block for advanced client-side filtering on the returned objects.
 
 ## Examples
 
-### Example 1 --- Search by name
+### Example 1 - Search by name
 
 ```powershell
-Get-LKPolicy -Name "XW365" -NameMatch Contains
+Get-LKPolicy -Name "Contoso" -NameMatch Contains
 ```
 
-### Example 2 --- Filter by type
+### Example 2 - Filter by type
 
 ```powershell
 Get-LKPolicy -PolicyType SettingsCatalog, CompliancePolicy
 ```
 
-### Example 3 --- Wildcard with scope filter
+### Example 3 - Wildcard with scope filter
 
 ```powershell
 Get-LKPolicy -Name "Baseline*" -NameMatch Wildcard -FilterScript { $_.TargetScope -eq 'Device' }
 ```
 
-### Example 4 --- Include settings
+### Example 4 - Include settings
 
 ```powershell
 Get-LKPolicy -Name "Firewall" -IncludeSettings | Select-Object Name, Settings
@@ -123,6 +122,6 @@ Get-LKPolicy -Name "Firewall" -IncludeSettings | Select-Object Name, Settings
 
 ## Related
 
-- [Get-LKPolicyOverview](Get-LKPolicyOverview.md) --- at-a-glance assignment summary
-- [Show-LKPolicyDetail](Show-LKPolicyDetail.md) --- detailed formatted view
-- [Get-LKPolicyAssignment](Get-LKPolicyAssignment.md) --- assignment details
+- [Get-LKPolicyOverview](Get-LKPolicyOverview.md) - at-a-glance assignment summary
+- [Show-LKPolicyDetail](Show-LKPolicyDetail.md) - detailed formatted view
+- [Get-LKPolicyAssignment](Get-LKPolicyAssignment.md) - assignment details

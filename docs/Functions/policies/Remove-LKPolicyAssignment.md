@@ -1,7 +1,6 @@
 ---
 title: Remove-LKPolicyAssignment
-parent: Policy Operations
-nav_order: 6
+nav_order: 22
 ---
 
 # Remove-LKPolicyAssignment
@@ -10,7 +9,7 @@ Removes a group include assignment from one or more Intune policies.
 
 ## Syntax
 
-```powershell
+```text
 # By name (default)
 Remove-LKPolicyAssignment
     -GroupName <String>
@@ -44,54 +43,54 @@ Fetches the current assignments, removes the matching group include, and writes 
 
 ### -GroupName
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes |
 
 ### -PolicyName
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | Yes (ByName) |
 
 ### -NameMatch
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Default | Contains |
 | Valid values | Contains, Exact, Wildcard, Regex |
 
 ### -SearchPolicyType
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | No |
 
 ### -InputObject
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ### -PolicyId
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ById) |
 
 ### -PolicyType
 
-Optional --- auto-resolved if omitted.
+Optional - auto-resolved if omitted.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 
 ## Outputs
 
@@ -105,13 +104,13 @@ Optional --- auto-resolved if omitted.
 
 ## Examples
 
-### Example 1 --- Pipeline
+### Example 1 - Pipeline
 
 ```powershell
-Get-LKPolicy -Name "XW365 - TestConfig" | Remove-LKPolicyAssignment -GroupName 'SG-Intune-TestDevices'
+Get-LKPolicy -Name "Contoso - TestConfig" | Remove-LKPolicyAssignment -GroupName 'SG-Intune-TestDevices'
 ```
 
-### Example 2 --- By ID
+### Example 2 - By ID
 
 ```powershell
 Remove-LKPolicyAssignment -GroupName 'TestDevices' -PolicyId 'abc-123' -PolicyType SettingsCatalog

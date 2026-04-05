@@ -1,14 +1,13 @@
 ---
 title: Remove-LKGroup
-parent: Group Operations
-nav_order: 3
+nav_order: 20
 ---
 
 # Remove-LKGroup
 Deletes an Entra ID group.
 
 ## Syntax
-```powershell
+```text
 # By name
 Remove-LKGroup -Name <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 
@@ -19,15 +18,15 @@ Remove-LKGroup -GroupId <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 ## Parameters
 
 ### -Name
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByName) |
 
 ### -GroupId
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ById) |
 
 ## Outputs

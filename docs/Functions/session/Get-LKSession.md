@@ -1,7 +1,6 @@
 ---
 title: Get-LKSession
-parent: Session Management
-nav_order: 2
+nav_order: 15
 ---
 
 # Get-LKSession
@@ -10,7 +9,7 @@ Returns the current LKIntuneFunctions session info.
 
 ## Syntax
 
-```powershell
+```text
 Get-LKSession [<CommonParameters>]
 ```
 
@@ -34,7 +33,7 @@ This command has no parameters.
 
 ## Examples
 
-### Example 1 --- Check current session
+### Example 1 - Check current session
 ```powershell
 Get-LKSession
 ```

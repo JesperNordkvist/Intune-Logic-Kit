@@ -1,14 +1,13 @@
 ---
 title: Add-LKGroupMember
-parent: Group Operations
-nav_order: 7
+nav_order: 2
 ---
 
 # Add-LKGroupMember
 Adds a device or user to an Entra ID group.
 
 ## Syntax
-```powershell
+```text
 # By device name
 Add-LKGroupMember -GroupName <String> -DeviceName <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 
@@ -28,40 +27,40 @@ Add-LKGroupMember -GroupName <String> [-InputObject <PSCustomObject>] [-WhatIf] 
 ## Parameters
 
 ### -GroupName
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes |
 
 ### -DeviceName
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByDeviceName) |
 
 ### -DeviceId
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByDeviceId) |
 
 ### -UserName
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByUserName) |
 
 ### -UserId
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByUserId) |
 
 ### -InputObject
 A device or user object. Accepted from the pipeline.
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ## Outputs
@@ -76,19 +75,19 @@ A device or user object. Accepted from the pipeline.
 
 ## Examples
 
-### Example 1 --- Add device by name
+### Example 1 - Add device by name
 ```powershell
 Add-LKGroupMember -GroupName 'SG-Intune-TestDevices' -DeviceName 'YOURPC-001'
 ```
 
-### Example 2 --- Pipeline from Get-LKDevice
+### Example 2 - Pipeline from Get-LKDevice
 ```powershell
-Get-LKDevice -User "Jesper" | Add-LKGroupMember -GroupName 'SG-Intune-TestDevices'
+Get-LKDevice -User "John" | Add-LKGroupMember -GroupName 'SG-Intune-TestDevices'
 ```
 
-### Example 3 --- Add user
+### Example 3 - Add user
 ```powershell
-Get-LKUser -Name "Jesper" | Add-LKGroupMember -GroupName 'SG-Intune-TestUsers'
+Get-LKUser -Name "John" | Add-LKGroupMember -GroupName 'SG-Intune-TestUsers'
 ```
 
 ## Related

@@ -1,7 +1,6 @@
 ---
 title: Add-LKPolicyExclusion
-parent: Policy Operations
-nav_order: 7
+nav_order: 4
 ---
 
 # Add-LKPolicyExclusion
@@ -10,7 +9,7 @@ Adds a group as an exclusion to one or more Intune policies.
 
 ## Syntax
 
-```powershell
+```text
 # By name
 Add-LKPolicyExclusion
     -GroupName <String>
@@ -46,23 +45,23 @@ Use `-All` to exclude a group from every policy in the tenant (or filtered by `-
 
 ### -GroupName
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes |
 
 ### -PolicyName
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | Yes (ByName) |
 
 ### -NameMatch
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Default | Contains |
 | Valid values | Contains, Exact, Wildcard, Regex |
 
@@ -70,23 +69,23 @@ Use `-All` to exclude a group from every policy in the tenant (or filtered by `-
 
 Exclude the group from all policies in the tenant.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | SwitchParameter |
+| Type | `SwitchParameter` |
 
 ### -PolicyType
 
 When used with `-All`, restricts which policy types are affected.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 
 ### -InputObject
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ## Outputs
@@ -101,19 +100,19 @@ When used with `-All`, restricts which policy types are affected.
 
 ## Examples
 
-### Example 1 --- Exclude from all policies
+### Example 1 - Exclude from all policies
 
 ```powershell
 Add-LKPolicyExclusion -GroupName 'SG-Intune-TestDevices' -All
 ```
 
-### Example 2 --- Exclude from compliance only
+### Example 2 - Exclude from compliance only
 
 ```powershell
 Add-LKPolicyExclusion -GroupName 'SG-Intune-TestDevices' -All -PolicyType CompliancePolicy
 ```
 
-### Example 3 --- Preview with WhatIf
+### Example 3 - Preview with WhatIf
 
 ```powershell
 Add-LKPolicyExclusion -GroupName 'TestGroup' -All -WhatIf

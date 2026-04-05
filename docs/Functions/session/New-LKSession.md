@@ -1,7 +1,6 @@
 ---
 title: New-LKSession
-parent: Session Management
-nav_order: 1
+nav_order: 19
 ---
 
 # New-LKSession
@@ -10,13 +9,13 @@ Opens an interactive login and connects to Microsoft Graph for Intune administra
 
 ## Syntax
 
-```powershell
+```text
 New-LKSession [<CommonParameters>]
 ```
 
 ## Description
 
-Launches a browser-based sign-in prompt using delegated authentication with the built-in Microsoft Graph PowerShell app --- no custom app registration required. The user's Intune Administrator role provides effective permissions.
+Launches a browser-based sign-in prompt using delegated authentication with the built-in Microsoft Graph PowerShell app - no custom app registration required. The user's Intune Administrator role provides effective permissions.
 
 If a previous session was established against a different tenant or account, a warning is shown so you don't accidentally work in the wrong environment.
 
@@ -35,7 +34,7 @@ This command has no parameters.
 
 ## Examples
 
-### Example 1 --- Connect to your tenant
+### Example 1 - Connect to your tenant
 ```powershell
 New-LKSession
 ```

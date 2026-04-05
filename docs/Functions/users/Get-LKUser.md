@@ -1,14 +1,13 @@
 ---
 title: Get-LKUser
-parent: User Operations
-nav_order: 1
+nav_order: 16
 ---
 
 # Get-LKUser
 Queries Entra ID users with flexible name and department filtering.
 
 ## Syntax
-```powershell
+```text
 Get-LKUser
     [-Name <String[]>]
     [-NameMatch <String>]
@@ -21,29 +20,29 @@ Get-LKUser
 
 ### -Name
 Search by display name or UPN.
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | No |
 
 ### -NameMatch
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Default | Contains |
 | Valid values | Contains, Exact, Wildcard, Regex |
 
 ### -Department
 Filter by department name.
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | No |
 
 ### -FilterScript
-| | |
+| Attribute | Value |
 |---|---|
-| Type | ScriptBlock |
+| Type | `ScriptBlock` |
 
 ## Outputs
 | Property | Type | Description |
@@ -58,17 +57,17 @@ Filter by department name.
 
 ## Examples
 
-### Example 1 --- Search by name
+### Example 1 - Search by name
 ```powershell
-Get-LKUser -Name "Jesper" -NameMatch Contains
+Get-LKUser -Name "John" -NameMatch Contains
 ```
 
-### Example 2 --- Search by UPN
+### Example 2 - Search by UPN
 ```powershell
-Get-LKUser -Name "jesper@contoso.com" -NameMatch Exact
+Get-LKUser -Name "john.doe@contoso.com" -NameMatch Exact
 ```
 
-### Example 3 --- Filter by department
+### Example 3 - Filter by department
 ```powershell
 Get-LKUser -Department "IT"
 ```

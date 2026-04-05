@@ -1,7 +1,6 @@
 ---
 title: Add-LKPolicyAssignment
-parent: Policy Operations
-nav_order: 5
+nav_order: 3
 ---
 
 # Add-LKPolicyAssignment
@@ -10,7 +9,7 @@ Adds a group as an include assignment to one or more Intune policies.
 
 ## Syntax
 
-```powershell
+```text
 # By name (default)
 Add-LKPolicyAssignment
     -GroupName <String>
@@ -41,7 +40,7 @@ Add-LKPolicyAssignment
 
 ## Description
 
-For each target policy, fetches the current assignments, appends a group include entry, and writes back the complete assignment set. Policies that already include the group are silently skipped. Performs a scope mismatch check --- if the group scope is incompatible with the policy scope, the assignment is skipped with a warning.
+For each target policy, fetches the current assignments, appends a group include entry, and writes back the complete assignment set. Policies that already include the group are silently skipped. Performs a scope mismatch check - if the group scope is incompatible with the policy scope, the assignment is skipped with a warning.
 
 ## Parameters
 
@@ -49,25 +48,25 @@ For each target policy, fetches the current assignments, appends a group include
 
 The exact display name of the Entra ID group to assign.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes |
 
 ### -PolicyName
 
 One or more policy name patterns.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | Yes (ByName) |
 
 ### -NameMatch
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Default | Contains |
 | Valid values | Contains, Exact, Wildcard, Regex |
 
@@ -75,42 +74,42 @@ One or more policy name patterns.
 
 Restrict the policy name search to specific types.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String[] |
+| Type | `String[]` |
 | Required | No |
 | Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
 
 ### -InputObject
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ### -PolicyId
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ById) |
 
 ### -PolicyType
 
-Optional --- auto-resolved if omitted.
+Optional - auto-resolved if omitted.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | No |
 
 ### -Intent
 
 The deployment intent for app assignments. Only applies to App policy type.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | No |
 | Valid values | Required, Available, Uninstall |
 
@@ -126,25 +125,25 @@ The deployment intent for app assignments. Only applies to App policy type.
 
 ## Examples
 
-### Example 1 --- By policy name
+### Example 1 - By policy name
 
 ```powershell
-Add-LKPolicyAssignment -PolicyName "XW365 - Win - SC - Microsoft Edge" -GroupName 'XW365-Intune-U-Pilot Users'
+Add-LKPolicyAssignment -PolicyName "Contoso - Win - SC - Microsoft Edge" -GroupName 'SG-Intune-U-Pilot Users'
 ```
 
-### Example 2 --- Pipeline from Get-LKPolicy
+### Example 2 - Pipeline from Get-LKPolicy
 
 ```powershell
-Get-LKPolicy -Name "XW365 - TestConfig" | Add-LKPolicyAssignment -GroupName 'SG-Intune-TestDevices'
+Get-LKPolicy -Name "Contoso - TestConfig" | Add-LKPolicyAssignment -GroupName 'SG-Intune-TestDevices'
 ```
 
-### Example 3 --- App as Required
+### Example 3 - App as Required
 
 ```powershell
 Get-LKPolicy -Name "Google Chrome" -PolicyType App | Add-LKPolicyAssignment -GroupName 'All Users' -Intent Required
 ```
 
-### Example 4 --- Fix audit mismatches
+### Example 4 - Fix audit mismatches
 
 ```powershell
 $mismatches = Test-LKPolicyAssignment | Where-Object Severity -eq 'Mismatch'
@@ -152,9 +151,9 @@ foreach ($m in $mismatches) {
     Remove-LKPolicyAssignment -PolicyName $m.PolicyName -NameMatch Exact `
         -SearchPolicyType $m.PolicyTypeId -GroupName $m.GroupName -Confirm:$false
     $correctGroup = if ($m.PolicyScope -eq 'Device') {
-        "XW365-Intune-D-Pilot Devices"
+        "SG-Intune-D-Pilot Devices"
     } else {
-        "XW365-Intune-U-Pilot Users"
+        "SG-Intune-U-Pilot Users"
     }
     Add-LKPolicyAssignment -PolicyName $m.PolicyName -NameMatch Exact `
         -SearchPolicyType $m.PolicyTypeId -GroupName $correctGroup -Confirm:$false

@@ -1,7 +1,6 @@
 ---
 title: Show-LKPolicyDetail
-parent: Policy Operations
-nav_order: 3
+nav_order: 26
 ---
 
 # Show-LKPolicyDetail
@@ -10,7 +9,7 @@ Displays a detailed, formatted view of one or more Intune policies including all
 
 ## Syntax
 
-```powershell
+```text
 # Pipeline
 Show-LKPolicyDetail
     [-InputObject <PSCustomObject>]
@@ -33,27 +32,27 @@ Fetches the full settings for each policy and renders them in a readable grouped
 
 A policy object from `Get-LKPolicy`. Accepted from the pipeline.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ### -PolicyId
 
 The Graph object ID of the policy.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ById) |
 
 ### -PolicyType
 
-The policy type key. Optional --- if omitted, the type is auto-resolved by probing all endpoints.
+The policy type key. Optional - if omitted, the type is auto-resolved by probing all endpoints.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | No |
 | Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
 
@@ -63,19 +62,19 @@ This command writes formatted output to the host. It does not emit pipeline obje
 
 ## Examples
 
-### Example 1 --- Pipeline from Get-LKPolicy
+### Example 1 - Pipeline from Get-LKPolicy
 
 ```powershell
-Get-LKPolicy -Name "XW365 - Baseline" | Show-LKPolicyDetail
+Get-LKPolicy -Name "Contoso - Baseline" | Show-LKPolicyDetail
 ```
 
-### Example 2 --- By ID
+### Example 2 - By ID
 
 ```powershell
 Show-LKPolicyDetail -PolicyId 'abc-123' -PolicyType SettingsCatalog
 ```
 
-### Example 3 --- Multiple policies
+### Example 3 - Multiple policies
 
 ```powershell
 Get-LKPolicy -PolicyType SettingsCatalog -Name "Firewall" | Show-LKPolicyDetail

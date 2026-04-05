@@ -1,14 +1,13 @@
 ---
 title: Invoke-LKDeviceAction
-parent: Device Operations
-nav_order: 3
+nav_order: 17
 ---
 
 # Invoke-LKDeviceAction
 Triggers a remote action on an Intune managed device.
 
 ## Syntax
-```powershell
+```text
 # By device name
 Invoke-LKDeviceAction
     -Action <String>
@@ -37,41 +36,41 @@ Invoke-LKDeviceAction
 ## Parameters
 
 ### -Action
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes |
 | Valid values | Sync, Restart, RemoteLock, Retire, Wipe |
 
 ### -DeviceName
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByDeviceName) |
 
 ### -DeviceId
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByDeviceId) |
 
 ### -InputObject
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ### -KeepUserData
 For Wipe action: preserve user data on the device.
-| | |
+| Attribute | Value |
 |---|---|
-| Type | SwitchParameter |
+| Type | `SwitchParameter` |
 
 ### -KeepEnrollmentData
 For Wipe action: preserve enrollment data on the device.
-| | |
+| Attribute | Value |
 |---|---|
-| Type | SwitchParameter |
+| Type | `SwitchParameter` |
 
 ## Outputs
 | Property | Type | Description |
@@ -83,17 +82,17 @@ For Wipe action: preserve enrollment data on the device.
 
 ## Examples
 
-### Example 1 --- Sync a device
+### Example 1 - Sync a device
 ```powershell
 Invoke-LKDeviceAction -DeviceName 'YOURPC-001' -Action Sync
 ```
 
-### Example 2 --- Restart via pipeline
+### Example 2 - Restart via pipeline
 ```powershell
-Get-LKDevice -User "Jesper" | Invoke-LKDeviceAction -Action Restart
+Get-LKDevice -User "John" | Invoke-LKDeviceAction -Action Restart
 ```
 
-### Example 3 --- Wipe with data preservation
+### Example 3 - Wipe with data preservation
 ```powershell
 Invoke-LKDeviceAction -DeviceName 'YOURPC-001' -Action Wipe -KeepUserData
 ```

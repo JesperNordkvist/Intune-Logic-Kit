@@ -1,14 +1,13 @@
 ---
 title: Remove-LKGroupMember
-parent: Group Operations
-nav_order: 8
+nav_order: 21
 ---
 
 # Remove-LKGroupMember
 Removes a device or user from an Entra ID group.
 
 ## Syntax
-```powershell
+```text
 # By device name
 Remove-LKGroupMember -GroupName <String> -DeviceName <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 
@@ -28,39 +27,39 @@ Remove-LKGroupMember -GroupName <String> [-InputObject <PSCustomObject>] [-WhatI
 ## Parameters
 
 ### -GroupName
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes |
 
 ### -DeviceName
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByDeviceName) |
 
 ### -DeviceId
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByDeviceId) |
 
 ### -UserName
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByUserName) |
 
 ### -UserId
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByUserId) |
 
 ### -InputObject
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ## Outputs
@@ -75,14 +74,14 @@ Remove-LKGroupMember -GroupName <String> [-InputObject <PSCustomObject>] [-WhatI
 
 ## Examples
 
-### Example 1 --- Remove device
+### Example 1 - Remove device
 ```powershell
 Remove-LKGroupMember -GroupName 'SG-Intune-TestDevices' -DeviceName 'YOURPC-001'
 ```
 
-### Example 2 --- Pipeline
+### Example 2 - Pipeline
 ```powershell
-Get-LKDevice -User "Jesper" | Remove-LKGroupMember -GroupName 'SG-Intune-TestDevices'
+Get-LKDevice -User "John" | Remove-LKGroupMember -GroupName 'SG-Intune-TestDevices'
 ```
 
 ## Related

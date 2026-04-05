@@ -40,10 +40,10 @@ Get-LKGroupAssignment -Name 'Pilot Devices' -NameMatch Exact
 
 - **26 commands** covering policies, assignments, groups, devices, and users
 - **15 policy types** supported including Settings Catalog, Endpoint Security, Compliance, Apps, and more
-- **Pipeline-friendly** --- all functions accept and emit objects for chaining
-- **Scope-aware** --- automatic detection of user/device scope mismatches
-- **Safe by default** --- all write operations support `-WhatIf` and `-Confirm`
-- **App intent support** --- Required, Available, and Uninstall for app assignments
+- **Pipeline-friendly** - all functions accept and emit objects for chaining
+- **Scope-aware** - automatic detection of user/device scope mismatches
+- **Safe by default** - all write operations support `-WhatIf` and `-Confirm`
+- **App intent support** - Required, Available, and Uninstall for app assignments
 
 ## Requirements
 
@@ -72,7 +72,7 @@ All functions that accept name filters use a consistent parameter set:
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `-Name` | `String[]` | --- | One or more name patterns to match |
+| `-Name` | `String[]` | - | One or more name patterns to match |
 | `-NameMatch` | `String` | `Contains` | Match mode: `Contains`, `Exact`, `Wildcard`, `Regex` |
 
 All write operations support `-WhatIf` and `-Confirm` via `SupportsShouldProcess`.

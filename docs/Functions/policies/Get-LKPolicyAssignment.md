@@ -1,7 +1,6 @@
 ---
 title: Get-LKPolicyAssignment
-parent: Policy Operations
-nav_order: 4
+nav_order: 13
 ---
 
 # Get-LKPolicyAssignment
@@ -10,7 +9,7 @@ Shows the assignment details (includes, excludes, intent) for one or more polici
 
 ## Syntax
 
-```powershell
+```text
 # Pipeline
 Get-LKPolicyAssignment
     [-InputObject <PSCustomObject>]
@@ -31,25 +30,25 @@ For each policy, fetches all assignments from the Graph API and returns structur
 
 ### -InputObject
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ### -PolicyId
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ById) |
 
 ### -PolicyType
 
-Optional --- auto-resolved if omitted.
+Optional - auto-resolved if omitted.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | No |
 | Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
 
@@ -69,25 +68,25 @@ Optional --- auto-resolved if omitted.
 
 ## Examples
 
-### Example 1 --- Pipeline
+### Example 1 - Pipeline
 
 ```powershell
-Get-LKPolicy -Name "XW365" | Get-LKPolicyAssignment
+Get-LKPolicy -Name "Contoso" | Get-LKPolicyAssignment
 ```
 
-### Example 2 --- By ID
+### Example 2 - By ID
 
 ```powershell
 Get-LKPolicyAssignment -PolicyId 'abc-123'
 ```
 
-### Example 3 --- Filter to exclusions
+### Example 3 - Filter to exclusions
 
 ```powershell
 Get-LKPolicy -Name "Firewall" | Get-LKPolicyAssignment | Where-Object AssignmentType -eq 'Exclude'
 ```
 
-### Example 4 --- App intent
+### Example 4 - App intent
 
 ```powershell
 Get-LKPolicy -PolicyType App | Get-LKPolicyAssignment | Format-Table PolicyName, AssignmentType, GroupName, Intent

@@ -1,7 +1,6 @@
 ---
 title: Close-LKSession
-parent: Session Management
-nav_order: 3
+nav_order: 5
 ---
 
 # Close-LKSession
@@ -10,7 +9,7 @@ Disconnects from Microsoft Graph and ends the current session.
 
 ## Syntax
 
-```powershell
+```text
 Close-LKSession [<CommonParameters>]
 ```
 
@@ -24,7 +23,7 @@ This command has no parameters.
 
 ## Examples
 
-### Example 1 --- End the session
+### Example 1 - End the session
 ```powershell
 Close-LKSession
 ```

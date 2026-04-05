@@ -1,7 +1,6 @@
 ---
 title: Rename-LKPolicy
-parent: Policy Operations
-nav_order: 11
+nav_order: 25
 ---
 
 # Rename-LKPolicy
@@ -10,7 +9,7 @@ Renames an Intune policy.
 
 ## Syntax
 
-```powershell
+```text
 # Pipeline
 Rename-LKPolicy
     [-InputObject <PSCustomObject>]
@@ -31,31 +30,31 @@ Rename-LKPolicy
 
 ### -InputObject
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ### -PolicyId
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ById) |
 
 ### -PolicyType
 
-Optional --- auto-resolved if omitted.
+Optional - auto-resolved if omitted.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 
 ### -NewName
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes |
 
 ## Outputs
@@ -70,13 +69,13 @@ Optional --- auto-resolved if omitted.
 
 ## Examples
 
-### Example 1 --- Pipeline
+### Example 1 - Pipeline
 
 ```powershell
 Get-LKPolicy -Name "Old Policy Name" -NameMatch Exact | Rename-LKPolicy -NewName "New Policy Name"
 ```
 
-### Example 2 --- By ID
+### Example 2 - By ID
 
 ```powershell
 Rename-LKPolicy -PolicyId 'abc-123' -NewName "New Name"

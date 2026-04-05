@@ -1,14 +1,13 @@
 ---
 title: Rename-LKGroup
-parent: Group Operations
-nav_order: 4
+nav_order: 24
 ---
 
 # Rename-LKGroup
 Renames an existing Entra ID group.
 
 ## Syntax
-```powershell
+```text
 # By name
 Rename-LKGroup -Name <String> -NewName <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 
@@ -19,21 +18,21 @@ Rename-LKGroup -GroupId <String> -NewName <String> [-WhatIf] [-Confirm] [<Common
 ## Parameters
 
 ### -Name
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByName) |
 
 ### -GroupId
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ById) |
 
 ### -NewName
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes |
 
 ## Outputs

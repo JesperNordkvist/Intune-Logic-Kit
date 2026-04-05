@@ -1,7 +1,6 @@
 ---
 title: Copy-LKPolicyAssignment
-parent: Policy Operations
-nav_order: 9
+nav_order: 6
 ---
 
 # Copy-LKPolicyAssignment
@@ -10,7 +9,7 @@ Copies all assignments from a source policy to one or more target policies.
 
 ## Syntax
 
-```powershell
+```text
 # Pipeline (source object + pipeline targets)
 Copy-LKPolicyAssignment
     -SourcePolicy <PSCustomObject>
@@ -49,57 +48,57 @@ Reads all assignments from the source policy and writes them to each target. In 
 
 A policy object from `Get-LKPolicy` to copy assignments from.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Required | Yes (ByPipeline, ByTargetId) |
 
 ### -SourcePolicyId
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (BySourceId) |
 
 ### -SourcePolicyType
 
-Optional --- auto-resolved if omitted.
+Optional - auto-resolved if omitted.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 
 ### -InputObject
 
 Target policy from the pipeline.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | PSCustomObject |
+| Type | `PSCustomObject` |
 | Pipeline | ByValue |
 
 ### -TargetPolicyId
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Required | Yes (ByTargetId, BySourceId) |
 
 ### -TargetPolicyType
 
-Optional --- auto-resolved if omitted.
+Optional - auto-resolved if omitted.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 
 ### -Mode
 
 `Replace` (default) overwrites all target assignments. `Merge` adds without removing existing.
 
-| | |
+| Attribute | Value |
 |---|---|
-| Type | String |
+| Type | `String` |
 | Default | Replace |
 | Valid values | Replace, Merge |
 
@@ -115,18 +114,18 @@ Optional --- auto-resolved if omitted.
 
 ## Examples
 
-### Example 1 --- Copy to all matching targets
+### Example 1 - Copy to all matching targets
 
 ```powershell
 $source = Get-LKPolicy -Name "Reference Policy" -NameMatch Exact
-Get-LKPolicy -Name "XW365*" -NameMatch Wildcard | Copy-LKPolicyAssignment -SourcePolicy $source
+Get-LKPolicy -Name "Contoso*" -NameMatch Wildcard | Copy-LKPolicyAssignment -SourcePolicy $source
 ```
 
-### Example 2 --- Merge mode
+### Example 2 - Merge mode
 
 ```powershell
 $source = Get-LKPolicy -Name "Reference Policy" -NameMatch Exact
-Get-LKPolicy -Name "XW365*" | Copy-LKPolicyAssignment -SourcePolicy $source -Mode Merge
+Get-LKPolicy -Name "Contoso*" | Copy-LKPolicyAssignment -SourcePolicy $source -Mode Merge
 ```
 
 ## Related
