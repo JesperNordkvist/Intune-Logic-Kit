@@ -74,7 +74,7 @@ Limits the scan to one or more specific policy types. If omitted, all types are 
 | Default: | -- (all types) |
 | Required: | No |
 | Pipeline: | No |
-| Valid values: | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, MobileApp |
+| Valid values: | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
 
 ### -AssignmentType
 Controls which assignment types are returned. Defaults to `Include`, which shows only policies where the group is actively targeted (include assignments and broad targets like All Devices/All Users). Use `Exclude` to see only exclusions, or `All` to see everything.

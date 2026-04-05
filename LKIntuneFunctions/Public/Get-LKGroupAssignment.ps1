@@ -58,7 +58,7 @@ function Get-LKGroupAssignment {
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
             'AppConfiguration', 'EnrollmentConfiguration', 'PolicySet',
             'GroupPolicyConfiguration', 'PlatformScript', 'Remediation',
-            'DriverUpdate', 'MobileApp'
+            'DriverUpdate', 'App'
         )]
         [string[]]$PolicyType,
 
@@ -142,7 +142,7 @@ function Get-LKGroupAssignment {
 
         foreach ($policy in $policies) {
             $policyName = $policy.($type.NameProperty)
-            $displayType = if ($type.TypeName -eq 'MobileApp' -and $policy.'@odata.type') {
+            $displayType = if ($type.TypeName -eq 'App' -and $policy.'@odata.type') {
                 Resolve-LKAppDisplayType -ODataType $policy.'@odata.type'
             } else {
                 $type.DisplayName

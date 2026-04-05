@@ -28,7 +28,7 @@ function Test-LKPolicyAssignment {
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
             'AppConfiguration', 'EnrollmentConfiguration', 'PolicySet',
             'GroupPolicyConfiguration', 'PlatformScript', 'Remediation',
-            'DriverUpdate', 'MobileApp'
+            'DriverUpdate', 'App'
         )]
         [string[]]$PolicyType,
 
@@ -78,7 +78,7 @@ function Test-LKPolicyAssignment {
             $policyName = $raw.$nameProp
             if (-not $policyName) { continue }
 
-            $displayType = if ($type.TypeName -eq 'MobileApp' -and $raw.'@odata.type') {
+            $displayType = if ($type.TypeName -eq 'App' -and $raw.'@odata.type') {
                 Resolve-LKAppDisplayType -ODataType $raw.'@odata.type'
             } else {
                 $type.DisplayName

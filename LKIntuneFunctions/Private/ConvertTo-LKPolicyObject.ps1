@@ -13,7 +13,7 @@ function ConvertTo-LKPolicyObject {
     $scope = if ($ResolvedScope) { $ResolvedScope } else { $PolicyType.TargetScope }
 
     # For MobileApp, resolve the specific app type from @odata.type
-    $displayType = if ($PolicyType.TypeName -eq 'MobileApp' -and $RawPolicy.'@odata.type') {
+    $displayType = if ($PolicyType.TypeName -eq 'App' -and $RawPolicy.'@odata.type') {
         Resolve-LKAppDisplayType -ODataType $RawPolicy.'@odata.type'
     } else {
         $PolicyType.DisplayName

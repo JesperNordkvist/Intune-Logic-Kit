@@ -52,7 +52,7 @@ Limits the query to one or more specific policy types instead of scanning all ty
 | Default: | -- (all types) |
 | Required: | No |
 | Pipeline: | No |
-| Valid values: | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, MobileApp |
+| Valid values: | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
 
 ### -ResolveScope
 When specified, performs additional Graph API calls to determine the accurate User/Device scope of each policy. Without this switch, the scope falls back to the static value from the policy type registry (often `Both`).

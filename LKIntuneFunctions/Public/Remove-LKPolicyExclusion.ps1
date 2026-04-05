@@ -24,7 +24,7 @@ function Remove-LKPolicyExclusion {
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
             'AppConfiguration', 'EnrollmentConfiguration', 'PolicySet',
             'GroupPolicyConfiguration', 'PlatformScript', 'Remediation',
-            'DriverUpdate', 'MobileApp'
+            'DriverUpdate', 'App'
         )]
         [string[]]$PolicyType,
 
@@ -41,7 +41,7 @@ function Remove-LKPolicyExclusion {
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
             'AppConfiguration', 'EnrollmentConfiguration', 'PolicySet',
             'GroupPolicyConfiguration', 'PlatformScript', 'Remediation',
-            'DriverUpdate', 'MobileApp'
+            'DriverUpdate', 'App'
         )]
         [string[]]$SearchPolicyType
     )

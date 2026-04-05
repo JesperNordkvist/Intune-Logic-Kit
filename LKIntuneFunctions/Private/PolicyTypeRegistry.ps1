@@ -140,8 +140,8 @@ $script:LKPolicyTypes = @(
         AssignmentMethod = 'Standard'
     }
     @{
-        TypeName         = 'MobileApp'
-        DisplayName      = 'Mobile App'
+        TypeName         = 'App'
+        DisplayName      = 'Application'
         Endpoint         = '/deviceAppManagement/mobileApps'
         ApiVersion       = 'v1.0'
         AssignmentPath   = '/assignments'

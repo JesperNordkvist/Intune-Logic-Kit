@@ -54,7 +54,7 @@ Get-LKPolicy -Name "Microsoft Edge" | Show-LKPolicyDetail
 | `PlatformScript` | Platform Scripts |
 | `Remediation` | Remediations |
 | `DriverUpdate` | Driver Update Profiles |
-| `MobileApp` | Mobile Apps (Win32, VPP, Store, LOB, etc.) |
+| `App` | Applications (Win32, VPP, Store, LOB, etc.) |
 
 ## Requirements
 

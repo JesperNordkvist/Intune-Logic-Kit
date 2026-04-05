@@ -103,6 +103,6 @@ Used with the `-PolicyType` parameter on `Get-LKPolicy`, `Get-LKGroupAssignment`
 | `PlatformScript` | Platform Scripts | Device | beta* |
 | `Remediation` | Remediations | Device | beta* |
 | `DriverUpdate` | Driver Update Profiles | Device | beta* |
-| `MobileApp` | Mobile Apps | Both | v1.0 |
+| `App` | Applications | Both | v1.0 |
 
 *\* Beta endpoints may change without notice. These policy types do not yet have stable v1.0 Graph API endpoints.*
