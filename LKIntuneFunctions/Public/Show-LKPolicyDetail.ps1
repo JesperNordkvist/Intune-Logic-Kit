@@ -20,7 +20,7 @@ function Show-LKPolicyDetail {
         [Parameter(Mandatory, ParameterSetName = 'ById')]
         [string]$PolicyId,
 
-        [Parameter(Mandatory, ParameterSetName = 'ById')]
+        [Parameter(ParameterSetName = 'ById')]
         [ValidateSet(
             'DeviceConfiguration', 'SettingsCatalog', 'CompliancePolicy', 'EndpointSecurity',
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
@@ -38,7 +38,6 @@ function Show-LKPolicyDetail {
     process {
         if ($InputObject) {
             $id   = $InputObject.Id
-            $type = $InputObject.PolicyType
             $name = $InputObject.Name
             $desc = $InputObject.Description
             $displayType = $InputObject.DisplayType
@@ -46,21 +45,32 @@ function Show-LKPolicyDetail {
             $created = $InputObject.CreatedAt
             $modified = $InputObject.ModifiedAt
             $raw = $InputObject.RawObject
-        } else {
+            $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $InputObject.PolicyType }
+        } elseif ($PolicyType) {
             $id   = $PolicyId
-            $type = $PolicyType
-            $name = $null
-            $desc = $null
-            $displayType = $null
-            $scope = $null
-            $created = $null
-            $modified = $null
-            $raw = $null
+            $name = $null; $desc = $null; $displayType = $null
+            $scope = $null; $created = $null; $modified = $null; $raw = $null
+            $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $PolicyType }
+        } else {
+            try {
+                $resolved = Resolve-LKPolicyTypeById -PolicyId $PolicyId
+                $id        = $PolicyId
+                $typeEntry = $resolved.TypeEntry
+                $raw       = $resolved.RawPolicy
+                $name      = $resolved.PolicyName
+                $desc      = $raw.description
+                $displayType = $typeEntry.DisplayName
+                $scope     = $typeEntry.TargetScope
+                $created   = $raw.createdDateTime
+                $modified  = $raw.lastModifiedDateTime
+            } catch {
+                Write-Warning $_.Exception.Message
+                return
+            }
         }
 
-        $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $type }
         if (-not $typeEntry) {
-            Write-Warning "Unknown policy type: $type"
+            Write-Warning "Could not resolve policy type for '$id'."
             return
         }
 

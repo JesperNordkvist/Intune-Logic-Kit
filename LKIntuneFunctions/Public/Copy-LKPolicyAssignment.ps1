@@ -21,7 +21,7 @@ function Copy-LKPolicyAssignment {
         [Parameter(Mandatory, ParameterSetName = 'BySourceId')]
         [string]$SourcePolicyId,
 
-        [Parameter(Mandatory, ParameterSetName = 'BySourceId')]
+        [Parameter(ParameterSetName = 'BySourceId')]
         [ValidateSet(
             'DeviceConfiguration', 'SettingsCatalog', 'CompliancePolicy', 'EndpointSecurity',
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
@@ -38,8 +38,8 @@ function Copy-LKPolicyAssignment {
         [Parameter(Mandatory, ParameterSetName = 'BySourceId')]
         [string]$TargetPolicyId,
 
-        [Parameter(Mandatory, ParameterSetName = 'ByTargetId')]
-        [Parameter(Mandatory, ParameterSetName = 'BySourceId')]
+        [Parameter(ParameterSetName = 'ByTargetId')]
+        [Parameter(ParameterSetName = 'BySourceId')]
         [ValidateSet(
             'DeviceConfiguration', 'SettingsCatalog', 'CompliancePolicy', 'EndpointSecurity',
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
@@ -58,17 +58,21 @@ function Copy-LKPolicyAssignment {
 
         if ($SourcePolicy) {
             $srcId   = $SourcePolicy.Id
-            $srcType = $SourcePolicy.PolicyType
             $srcName = $SourcePolicy.Name
-        } else {
+            $srcTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $SourcePolicy.PolicyType }
+        } elseif ($SourcePolicyType) {
             $srcId   = $SourcePolicyId
-            $srcType = $SourcePolicyType
             $srcName = $SourcePolicyId
+            $srcTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $SourcePolicyType }
+        } else {
+            $resolved = Resolve-LKPolicyTypeById -PolicyId $SourcePolicyId
+            $srcId        = $SourcePolicyId
+            $srcName      = $resolved.PolicyName
+            $srcTypeEntry = $resolved.TypeEntry
         }
 
-        $srcTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $srcType }
         if (-not $srcTypeEntry) {
-            throw "Unknown source policy type: $srcType"
+            throw "Could not resolve source policy type."
         }
 
         try {
@@ -87,21 +91,30 @@ function Copy-LKPolicyAssignment {
 
         if ($InputObject) {
             $tgtId   = $InputObject.Id
-            $tgtType = $InputObject.PolicyType
             $tgtName = $InputObject.Name
-        } else {
+            $tgtTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $InputObject.PolicyType }
+        } elseif ($TargetPolicyType) {
             $tgtId   = $TargetPolicyId
-            $tgtType = $TargetPolicyType
             $tgtName = $TargetPolicyId
+            $tgtTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $TargetPolicyType }
+        } else {
+            try {
+                $resolved = Resolve-LKPolicyTypeById -PolicyId $TargetPolicyId
+                $tgtId        = $TargetPolicyId
+                $tgtName      = $resolved.PolicyName
+                $tgtTypeEntry = $resolved.TypeEntry
+            } catch {
+                Write-Warning $_.Exception.Message
+                return
+            }
         }
 
-        $tgtTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $tgtType }
         if (-not $tgtTypeEntry) {
-            Write-Warning "Unknown target policy type: $tgtType"
+            Write-Warning "Could not resolve target policy type for '$tgtId'."
             return
         }
 
-        if ($srcId -eq $tgtId -and $srcType -eq $tgtType) {
+        if ($srcId -eq $tgtId -and $srcTypeEntry.TypeName -eq $tgtTypeEntry.TypeName) {
             Write-Warning "Skipping '$tgtName' - same as source policy."
             return
         }

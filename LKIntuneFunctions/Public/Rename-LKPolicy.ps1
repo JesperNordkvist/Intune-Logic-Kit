@@ -15,7 +15,7 @@ function Rename-LKPolicy {
         [Parameter(Mandatory, ParameterSetName = 'ById')]
         [string]$PolicyId,
 
-        [Parameter(Mandatory, ParameterSetName = 'ById')]
+        [Parameter(ParameterSetName = 'ById')]
         [ValidateSet(
             'DeviceConfiguration', 'SettingsCatalog', 'CompliancePolicy', 'EndpointSecurity',
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
@@ -36,17 +36,26 @@ function Rename-LKPolicy {
     process {
         if ($InputObject) {
             $id   = $InputObject.Id
-            $type = $InputObject.PolicyType
             $name = $InputObject.Name
-        } else {
+            $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $InputObject.PolicyType }
+        } elseif ($PolicyType) {
             $id   = $PolicyId
-            $type = $PolicyType
             $name = $PolicyId
+            $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $PolicyType }
+        } else {
+            try {
+                $resolved = Resolve-LKPolicyTypeById -PolicyId $PolicyId
+                $id        = $PolicyId
+                $name      = $resolved.PolicyName
+                $typeEntry = $resolved.TypeEntry
+            } catch {
+                Write-Warning $_.Exception.Message
+                return
+            }
         }
 
-        $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $type }
         if (-not $typeEntry) {
-            Write-Warning "Unknown policy type: $type"
+            Write-Warning "Could not resolve policy type for '$id'."
             return
         }
 

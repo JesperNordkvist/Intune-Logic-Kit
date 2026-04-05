@@ -12,7 +12,7 @@ function Get-LKPolicyAssignment {
         [Parameter(Mandatory, ParameterSetName = 'ById')]
         [string]$PolicyId,
 
-        [Parameter(Mandatory, ParameterSetName = 'ById')]
+        [Parameter(ParameterSetName = 'ById')]
         [ValidateSet(
             'DeviceConfiguration', 'SettingsCatalog', 'CompliancePolicy', 'EndpointSecurity',
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
@@ -34,17 +34,29 @@ function Get-LKPolicyAssignment {
     process {
         if ($InputObject) {
             $id   = $InputObject.Id
-            $type = $InputObject.PolicyType
             $name = $InputObject.Name
-        } else {
+            $type = $InputObject.PolicyType
+            $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $type }
+        } elseif ($PolicyType) {
             $id   = $PolicyId
-            $type = $PolicyType
             $name = $null
+            $type = $PolicyType
+            $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $PolicyType }
+        } else {
+            try {
+                $resolved = Resolve-LKPolicyTypeById -PolicyId $PolicyId
+                $id        = $PolicyId
+                $name      = $resolved.PolicyName
+                $type      = $resolved.TypeEntry.TypeName
+                $typeEntry = $resolved.TypeEntry
+            } catch {
+                Write-Warning $_.Exception.Message
+                return
+            }
         }
 
-        $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $type }
         if (-not $typeEntry) {
-            Write-Warning "Unknown policy type: $type"
+            Write-Warning "Could not resolve policy type for '$id'."
             return
         }
 
