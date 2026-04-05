@@ -76,12 +76,12 @@ function Get-LKPolicyAssignment {
             $groupName = $null
 
             $assignmentType = switch -Wildcard ($odataType) {
-                '*exclusionGroupAssignmentTarget' { 'Exclude' }
-                '*groupAssignmentTarget'          { 'Include' }
-                '*allDevicesAssignmentTarget'      { 'AllDevices' }
-                '*allUsersAssignmentTarget'        { 'AllUsers' }
-                '*allLicensedUsersAssignmentTarget' { 'AllLicensedUsers' }
-                default                            { 'Unknown' }
+                '*exclusionGroupAssignmentTarget'   { 'Exclude'; break }
+                '*groupAssignmentTarget'            { 'Include'; break }
+                '*allDevicesAssignmentTarget'        { 'AllDevices'; break }
+                '*allUsersAssignmentTarget'          { 'AllUsers'; break }
+                '*allLicensedUsersAssignmentTarget'  { 'AllLicensedUsers'; break }
+                default                              { 'Unknown' }
             }
 
             if ($groupId) {
