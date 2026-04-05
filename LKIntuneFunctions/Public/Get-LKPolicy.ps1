@@ -64,7 +64,6 @@ function Get-LKPolicy {
 
         foreach ($raw in $rawPolicies) {
             $nameProp = $type.NameProperty
-            if (-not $raw.PSObject.Properties[$nameProp]) { continue }
             $policyName = $raw.$nameProp
             if (-not $policyName) { continue }
 
@@ -84,7 +83,15 @@ function Get-LKPolicy {
             }
 
             if ($IncludeSettings) {
-                $settings = Get-LKPolicySettings -PolicyId $raw.id -PolicyType $type -RawPolicy $raw
+                $rawSettings = Get-LKPolicySettings -PolicyId $raw.id -PolicyType $type -RawPolicy $raw
+                $settings = @($rawSettings | ForEach-Object {
+                    [PSCustomObject]@{
+                        PSTypeName = 'LKPolicySetting'
+                        Name       = $_.Name
+                        Value      = $_.Value
+                        Category   = $_.Category
+                    }
+                })
                 $obj | Add-Member -NotePropertyName 'Settings' -NotePropertyValue $settings
             }
 

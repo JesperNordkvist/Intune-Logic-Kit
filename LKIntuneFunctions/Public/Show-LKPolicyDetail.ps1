@@ -166,7 +166,7 @@ function Show-LKPolicyDetail {
             # Group by category
             $grouped = $settings | Group-Object { $_.Category }
             $maxNameLen = ($settings | ForEach-Object { $_.Name.Length } | Measure-Object -Maximum).Maximum
-            $maxNameLen = [Math]::Min($maxNameLen, 55)
+            $maxNameLen = [Math]::Min($maxNameLen, 65)
 
             foreach ($group in $grouped) {
                 if ($grouped.Count -gt 1) {
@@ -176,8 +176,8 @@ function Show-LKPolicyDetail {
 
                 foreach ($s in $group.Group) {
                     $settingName = $s.Name
-                    if ($settingName.Length -gt 55) {
-                        $settingName = $settingName.Substring(0, 52) + '...'
+                    if ($settingName.Length -gt 65) {
+                        $settingName = $settingName.Substring(0, 62) + '...'
                     }
                     $paddedName = $settingName.PadRight($maxNameLen)
 
@@ -188,7 +188,7 @@ function Show-LKPolicyDetail {
                     } elseif ("$($s.Value)" -eq 'False') {
                         'No'
                     } else {
-                        "$($s.Value)"
+                        "$($s.Value)".TrimEnd('.')
                     }
 
                     # Truncate very long values

@@ -60,9 +60,10 @@ function Get-LKSettingsCatalogSettings {
     [CmdletBinding()]
     param([string]$PolicyId)
 
+    # Fetch settings with expanded definitions in one call — gives us displayName and option labels
     try {
         $settings = Invoke-LKGraphRequest -Method GET `
-            -Uri "/deviceManagement/configurationPolicies/$PolicyId/settings" `
+            -Uri "/deviceManagement/configurationPolicies/$PolicyId/settings?`$expand=settingDefinitions" `
             -ApiVersion 'beta' -All
     } catch {
         Write-Verbose "Failed to fetch Settings Catalog settings: $($_.Exception.Message)"
@@ -71,9 +72,28 @@ function Get-LKSettingsCatalogSettings {
 
     if (-not $settings) { return @() }
 
+    # Build a lookup of definition ID -> displayName and option itemId -> displayName
+    $defLookup = @{}
+    foreach ($setting in $settings) {
+        if ($setting.settingDefinitions) {
+            foreach ($d in $setting.settingDefinitions) {
+                if ($d.id -and $d.displayName) {
+                    $defLookup[$d.id] = $d.displayName
+                }
+                if ($d.options) {
+                    foreach ($opt in $d.options) {
+                        if ($opt.itemId -and $opt.displayName) {
+                            $defLookup[$opt.itemId] = $opt.displayName
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     $results = [System.Collections.ArrayList]::new()
     foreach ($setting in $settings) {
-        Expand-LKSettingInstance -Instance $setting.settingInstance -Results $results -Depth 0
+        Expand-LKSettingInstance -Instance $setting.settingInstance -Results $results -Depth 0 -DefinitionLookup $defLookup
     }
     return @($results)
 }
@@ -83,15 +103,31 @@ function Expand-LKSettingInstance {
     param(
         [object]$Instance,
         [System.Collections.ArrayList]$Results,
-        [int]$Depth
+        [int]$Depth,
+        [hashtable]$DefinitionLookup = @{}
     )
 
     if (-not $Instance) { return }
 
     $defId = $Instance.settingDefinitionId
-    # Extract a human-readable name from the definition ID (e.g., "device_vendor_msft_policy_config_update_allowautoupdate")
-    $friendlyName = if ($defId) {
-        ($defId -split '_' | Select-Object -Skip 1) -join ' '
+
+    # Use the definition display name if available, otherwise fall back to cleaned-up ID
+    $friendlyName = if ($defId -and $DefinitionLookup.ContainsKey($defId)) {
+        $DefinitionLookup[$defId]
+    } elseif ($defId) {
+        # Fallback: strip common prefixes and title-case segments
+        $stripped = $defId -replace '^(device|user)_vendor_msft_(policy_config_)?', '' `
+                          -replace '^(device|user)_', ''
+        $segments = @($stripped -split '_' | Where-Object { $_ } | ForEach-Object {
+            $_.Substring(0,1).ToUpper() + $_.Substring(1)
+        })
+        if ($segments.Count -ge 2) {
+            "$($segments[0]) / $($segments[1..($segments.Count-1)] -join ' ')"
+        } elseif ($segments.Count -eq 1) {
+            $segments[0]
+        } else {
+            $defId
+        }
     } else {
         'Unknown Setting'
     }
@@ -101,13 +137,21 @@ function Expand-LKSettingInstance {
     switch -Wildcard ($odataType) {
         '*choiceSettingInstance' {
             $valueId = $Instance.choiceSettingValue.value
-            $displayValue = if ($valueId) { ($valueId -split '_') | Select-Object -Last 1 } else { '(not set)' }
+            $displayValue = if ($valueId -and $DefinitionLookup.ContainsKey($valueId)) {
+                $DefinitionLookup[$valueId]
+            } elseif ($valueId -and $defId) {
+                # Strip the definition ID prefix to get the meaningful suffix
+                $suffix = $valueId -replace [regex]::Escape($defId), '' -replace '^_', ''
+                if ($suffix) { $suffix } else { ($valueId -split '_') | Select-Object -Last 1 }
+            } elseif ($valueId) {
+                ($valueId -split '_') | Select-Object -Last 1
+            } else { '(not set)' }
             $Results.Add(@{ Name = $friendlyName; Value = $displayValue; Category = 'Settings Catalog' }) | Out-Null
 
             # Recurse into children
             if ($Instance.choiceSettingValue.children) {
                 foreach ($child in $Instance.choiceSettingValue.children) {
-                    Expand-LKSettingInstance -Instance $child -Results $Results -Depth ($Depth + 1)
+                    Expand-LKSettingInstance -Instance $child -Results $Results -Depth ($Depth + 1) -DefinitionLookup $DefinitionLookup
                 }
             }
         }
@@ -123,7 +167,7 @@ function Expand-LKSettingInstance {
         '*groupSettingInstance' {
             if ($Instance.groupSettingValue.children) {
                 foreach ($child in $Instance.groupSettingValue.children) {
-                    Expand-LKSettingInstance -Instance $child -Results $Results -Depth ($Depth + 1)
+                    Expand-LKSettingInstance -Instance $child -Results $Results -Depth ($Depth + 1) -DefinitionLookup $DefinitionLookup -DefinitionLookup $DefinitionLookup
                 }
             }
         }
@@ -133,7 +177,7 @@ function Expand-LKSettingInstance {
                 $idx++
                 if ($group.children) {
                     foreach ($child in $group.children) {
-                        Expand-LKSettingInstance -Instance $child -Results $Results -Depth ($Depth + 1)
+                        Expand-LKSettingInstance -Instance $child -Results $Results -Depth ($Depth + 1) -DefinitionLookup $DefinitionLookup
                     }
                 }
             }
