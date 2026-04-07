@@ -15,6 +15,7 @@ Test-LKPolicyAssignment
     [-Name <String[]>]
     [-NameMatch <String>]
     [-Detailed]
+    [-DisplayAs <String>]
     [<CommonParameters>]
 ```
 
@@ -58,6 +59,16 @@ Shows a formatted, color-coded summary in the host. Mismatches in red, warnings 
 | Attribute | Value |
 |---|---|
 | Type | `SwitchParameter` |
+
+### -DisplayAs
+
+Controls output format. Default shows full object properties (List). Table shows a compact view with key columns sized to fit the data.
+
+| Attribute | Value |
+|---|---|
+| Type | `String` |
+| Default | List |
+| Valid values | List, Table |
 
 ## Outputs
 

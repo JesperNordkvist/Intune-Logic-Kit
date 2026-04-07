@@ -15,6 +15,7 @@ Get-LKUser
     [-NameMatch <String>]
     [-Department <String>]
     [-FilterScript <ScriptBlock>]
+    [-DisplayAs <String>]
     [<CommonParameters>]
 ```
 
@@ -51,6 +52,16 @@ Filter by department name.
 | Attribute | Value |
 |---|---|
 | Type | `ScriptBlock` |
+
+### -DisplayAs
+
+Controls output format. Default shows full object properties (List). Table shows a compact view with key columns sized to fit the data.
+
+| Attribute | Value |
+|---|---|
+| Type | `String` |
+| Default | List |
+| Valid values | List, Table |
 
 ## Outputs
 

@@ -11,13 +11,13 @@ Lists the members of an Entra ID group.
 
 ```text
 # By name
-Get-LKGroupMember -GroupName <String> [-MemberType <String>] [<CommonParameters>]
+Get-LKGroupMember -GroupName <String> [-MemberType <String>] [-DisplayAs <String>] [<CommonParameters>]
 
 # By ID
-Get-LKGroupMember -GroupId <String> [-MemberType <String>] [<CommonParameters>]
+Get-LKGroupMember -GroupId <String> [-MemberType <String>] [-DisplayAs <String>] [<CommonParameters>]
 
 # Pipeline
-Get-LKGroupMember [-InputObject <PSCustomObject>] [-MemberType <String>] [<CommonParameters>]
+Get-LKGroupMember [-InputObject <PSCustomObject>] [-MemberType <String>] [-DisplayAs <String>] [<CommonParameters>]
 ```
 
 ## Parameters
@@ -54,6 +54,16 @@ Filter to devices or users only. Default: `All`.
 | Type | `String` |
 | Default | All |
 | Valid values | All, Device, User |
+
+### -DisplayAs
+
+Controls output format. Default shows full object properties (List). Table shows a compact view with key columns sized to fit the data.
+
+| Attribute | Value |
+|---|---|
+| Type | `String` |
+| Default | List |
+| Valid values | List, Table |
 
 ## Outputs
 

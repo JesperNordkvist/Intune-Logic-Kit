@@ -32,9 +32,20 @@ This command has no parameters.
 | Account | String | Signed-in user's UPN |
 | ConnectedAt | DateTime | When the session was established |
 
+## Notes
+
+After connecting, the module automatically checks GitHub for a newer release. If one is available, a message is displayed with the latest version number. Run `Update-LKModule` to update in place.
+
 ## Examples
 
 ### Example 1 - Connect to your tenant
+
 ```powershell
 New-LKSession
 ```
+
+## Related
+
+- [Close-LKSession](Close-LKSession.md)
+- [Get-LKSession](Get-LKSession.md)
+- [Update-LKModule](Update-LKModule.md)

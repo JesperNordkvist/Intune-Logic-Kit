@@ -40,7 +40,7 @@ Import-Module .\Lowkey-Intune-Functions\LKIntuneFunctions\LKIntuneFunctions.psd1
 
 ---
 
-The module checks for updates automatically when you run `New-LKSession`.
+The module checks for updates automatically when you run `New-LKSession`. To update in place, run `Update-LKModule`.
 
 ## Quick Start
 
@@ -63,7 +63,7 @@ Get-LKGroupAssignment -Name 'Pilot Devices' -NameMatch Exact
 
 ## Features
 
-- **26 commands** covering policies, assignments, groups, devices, and users
+- **27 commands** covering policies, assignments, groups, devices, and users
 - **15 policy types** supported including Settings Catalog, Endpoint Security, Compliance, Apps, and more
 - **Pipeline-friendly** - all functions accept and emit objects for chaining
 - **Scope-aware** - automatic detection of user/device scope mismatches

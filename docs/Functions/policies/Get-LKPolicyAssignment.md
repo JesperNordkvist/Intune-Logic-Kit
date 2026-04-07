@@ -13,12 +13,14 @@ Shows the assignment details (includes, excludes, intent) for one or more polici
 # Pipeline
 Get-LKPolicyAssignment
     [-InputObject <PSCustomObject>]
+    [-DisplayAs <String>]
     [<CommonParameters>]
 
 # By ID
 Get-LKPolicyAssignment
     -PolicyId <String>
     [-PolicyType <String>]
+    [-DisplayAs <String>]
     [<CommonParameters>]
 ```
 
@@ -51,6 +53,16 @@ Optional - auto-resolved if omitted.
 | Type | `String` |
 | Required | No |
 | Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
+
+### -DisplayAs
+
+Controls output format. Default shows full object properties (List). Table shows a compact view with key columns sized to fit the data.
+
+| Attribute | Value |
+|---|---|
+| Type | `String` |
+| Default | List |
+| Valid values | List, Table |
 
 ## Outputs
 
