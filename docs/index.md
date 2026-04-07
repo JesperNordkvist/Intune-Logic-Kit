@@ -16,27 +16,35 @@ Manage policies, assignments, groups, devices, and users from the command line w
 
 ## Installation
 
-[Download latest release (.zip)](https://github.com/JesperNordkvist/Lowkey-Intune-Functions/releases/latest){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+### Option 1 - Download the latest release
+
+1. Download the latest release [here](https://github.com/JesperNordkvist/Lowkey-Intune-Functions/releases/latest)
+2. Extract the zip to a folder of your choice
+3. Import the module:
 
 ```powershell
-# Extract the zip, then import
-Import-Module .\LKIntuneFunctions\LKIntuneFunctions.psd1
-
-# Or clone the repository
-git clone https://github.com/JesperNordkvist/Lowkey-Intune-Functions.git
-
-# Import the module
 Import-Module .\LKIntuneFunctions\LKIntuneFunctions.psd1
 ```
+
+### Option 2 - Clone the repository
+
+```
+git clone https://github.com/JesperNordkvist/Lowkey-Intune-Functions.git
+```
+
+Then import the module:
+
+```powershell
+Import-Module .\Lowkey-Intune-Functions\LKIntuneFunctions\LKIntuneFunctions.psd1
+```
+
+---
 
 The module checks for updates automatically when you run `New-LKSession`.
 
 ## Quick Start
 
 ```powershell
-# Import the module
-Import-Module .\LKIntuneFunctions.psd1
-
 # Connect to your tenant
 New-LKSession
 
@@ -92,7 +100,21 @@ All functions that accept name filters use a consistent parameter set:
 | `-Name` | `String[]` | - | One or more name patterns to match |
 | `-NameMatch` | `String` | `Contains` | Match mode: `Contains`, `Exact`, `Wildcard`, `Regex` |
 
-All write operations support `-WhatIf` and `-Confirm` via `SupportsShouldProcess`.
+All write operations (Add, Remove, Copy, Rename, New, Invoke) support `-WhatIf` and `-Confirm`:
+
+| Parameter | Effect |
+|---|---|
+| `-WhatIf` | Previews the action without making any changes - shows what *would* happen |
+| `-Confirm` | Prompts for confirmation before each action (enabled by default on destructive operations) |
+| `-Confirm:$false` | Suppresses the confirmation prompt for batch/scripted operations |
+
+```powershell
+# Preview what would be assigned without making changes
+Add-LKPolicyAssignment -PolicyName "Contoso Baseline" -GroupName 'SG-Pilot' -WhatIf
+
+# Suppress confirmation for scripted batch operations
+Get-LKPolicy -Name "Contoso" | Remove-LKPolicyAssignment -GroupName 'OldGroup' -Confirm:$false
+```
 
 ## Supported Policy Types
 
