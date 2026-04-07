@@ -341,7 +341,27 @@ function Test-LKPolicyAssignment {
 
     # Always emit objects to the pipeline (even in -Detailed mode, for capture)
     if ($DisplayAs -eq 'Table') {
-        $issues | Format-Table PolicyName, PolicyScope, GroupName, GroupScope, Severity -AutoSize
+        $colorRules = @{
+            PolicyName = { param($val, $row) 'White' }
+            PolicyScope = @{
+                'Device' = 'Cyan'
+                'User'   = 'DarkYellow'
+                'Both'   = 'White'
+            }
+            GroupName  = { param($val, $row) 'White' }
+            GroupScope = @{
+                'Device'  = 'Cyan'
+                'User'    = 'DarkYellow'
+                'Both'    = 'Yellow'
+                'Unknown' = 'DarkGray'
+            }
+            Severity   = @{
+                'Mismatch' = 'Red'
+                'Warning'  = 'Yellow'
+                'Info'     = 'DarkGray'
+            }
+        }
+        Write-LKTable -Data $issues -Columns PolicyName, PolicyScope, GroupName, GroupScope, Severity -ColorRules $colorRules
     } else {
         $issues
     }

@@ -308,6 +308,27 @@ function Get-LKGroupAssignment {
     Write-Progress -Activity "Scanning assignments for $groupLabel" -Completed
 
     if ($DisplayAs -eq 'Table' -and $collector.Count -gt 0) {
-        $collector | Format-Table PolicyName, DisplayType, AssignmentType, PolicyScope, Intent -AutoSize
+        $colorRules = @{
+            PolicyName     = { param($val, $row) 'White' }
+            DisplayType    = { param($val, $row) 'Gray' }
+            AssignmentType = @{
+                'Include'          = 'Green'
+                'Exclude'          = 'Magenta'
+                'AllDevices'       = 'DarkYellow'
+                'AllUsers'         = 'DarkYellow'
+                'AllLicensedUsers' = 'DarkYellow'
+            }
+            PolicyScope    = @{
+                'Device' = 'Cyan'
+                'User'   = 'DarkYellow'
+                'Both'   = 'White'
+            }
+            Intent         = @{
+                'required'  = 'Green'
+                'available' = 'DarkYellow'
+                'uninstall' = 'Magenta'
+            }
+        }
+        Write-LKTable -Data $collector -Columns PolicyName, DisplayType, AssignmentType, PolicyScope, Intent -ColorRules $colorRules
     }
 }
