@@ -262,7 +262,19 @@ function Get-LKGroupAssignment {
 
                     $gScope = $groupScopes[$g.Id]
 
+                    # Skip broad target matching when group scope is unknown -
+                    # can't confirm the group would be covered
+                    if ($gScope -eq 'Unknown') { continue }
+
                     foreach ($broad in $broadTargets) {
+                        # Only show broad targets that actually apply to this group's scope
+                        $applies = switch ($broad.Type) {
+                            'AllDevices'       { $gScope -in @('Device', 'Both'); break }
+                            'AllUsers'         { $gScope -in @('User', 'Both'); break }
+                            'AllLicensedUsers' { $gScope -in @('User', 'Both'); break }
+                        }
+                        if (-not $applies) { continue }
+
                         $broadImpliedScope = switch ($broad.Type) {
                             'AllDevices'       { 'Device'; break }
                             'AllUsers'         { 'User'; break }
@@ -287,6 +299,7 @@ function Get-LKGroupAssignment {
                             Intent         = $broad.Intent
                         }
                         if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
+                        break  # One broad target match per group per policy is enough
                     }
                 }
             }

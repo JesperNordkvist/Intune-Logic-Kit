@@ -32,7 +32,7 @@ Get-LKGroupAssignment
 
 ## Description
 
-Iterates across all policy types and checks each policy's assignments for the specified group(s). Also includes policies assigned to "All Devices" or "All Users" when they would effectively target the group (based on member scope), unless the group is explicitly excluded.
+Iterates across all policy types and checks each policy's assignments for the specified group(s). Also includes broad targets ("All Devices", "All Users", "All Licensed Users") when they would effectively target the group based on its member scope. A device group will see "All Devices" policies, a user group will see "All Users" policies, and mixed groups see both. Groups that are explicitly excluded from a policy are filtered out.
 
 Policy scope is automatically resolved via Graph metadata so that `ScopeMismatch` is accurate. Use `-SkipScopeResolution` for faster results.
 
@@ -80,12 +80,12 @@ Skip dynamic scope resolution for faster results. `ScopeMismatch` will be `$null
 
 ### -AssignmentType
 
-Filter by assignment type. Default: `Include`.
+Filter by assignment type. Default: `All` (shows includes, excludes, and broad targets).
 
 | Attribute | Value |
 |---|---|
 | Type | `String` |
-| Default | Include |
+| Default | All |
 | Valid values | Include, Exclude, All |
 
 ### -DisplayAs
