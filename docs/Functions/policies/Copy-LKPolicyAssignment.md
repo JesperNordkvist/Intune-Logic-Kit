@@ -5,102 +5,65 @@ nav_order: 6
 
 # Copy-LKPolicyAssignment
 
-Copies all assignments from a source policy to one or more target policies.
+Copies a group's policy assignments to another group.
 
 ## Syntax
 
 ```text
-# Pipeline (source object + pipeline targets)
 Copy-LKPolicyAssignment
-    -SourcePolicy <PSCustomObject>
-    [-InputObject <PSCustomObject>]
-    [-Mode <String>]
-    [-WhatIf] [-Confirm]
-    [<CommonParameters>]
-
-# By target ID
-Copy-LKPolicyAssignment
-    -SourcePolicy <PSCustomObject>
-    -TargetPolicyId <String>
-    [-TargetPolicyType <String>]
-    [-Mode <String>]
-    [-WhatIf] [-Confirm]
-    [<CommonParameters>]
-
-# By source ID
-Copy-LKPolicyAssignment
-    -SourcePolicyId <String>
-    [-SourcePolicyType <String>]
-    -TargetPolicyId <String>
-    [-TargetPolicyType <String>]
-    [-Mode <String>]
+    -SourceGroup <String>
+    -TargetGroup <String>
+    [-PolicyType <String[]>]
+    [-AssignmentType <String>]
     [-WhatIf] [-Confirm]
     [<CommonParameters>]
 ```
 
 ## Description
 
-Reads all assignments from the source policy and writes them to each target. In `Replace` mode (default), existing target assignments are overwritten. In `Merge` mode, source assignments are added without removing existing ones (duplicates are skipped).
+Finds all policies where the source group is assigned, then assigns the target group to those same policies. Skips policies where the target group is already assigned. Only explicit group assignments (Include/Exclude) are copied — broad targets (All Devices, All Users) are tenant-wide and not copied.
+
+App intent (Required, Available, Uninstall) is carried over automatically.
 
 ## Parameters
 
-### -SourcePolicy
+### -SourceGroup
 
-A policy object from `Get-LKPolicy` to copy assignments from.
-
-| Attribute | Value |
-|---|---|
-| Type | `PSCustomObject` |
-| Required | Yes (ByPipeline, ByTargetId) |
-
-### -SourcePolicyId
+Name of the group whose assignments to copy from. Must match exactly one group.
 
 | Attribute | Value |
 |---|---|
 | Type | `String` |
-| Required | Yes (BySourceId) |
+| Required | Yes |
 
-### -SourcePolicyType
+### -TargetGroup
 
-Optional - auto-resolved if omitted.
-
-| Attribute | Value |
-|---|---|
-| Type | `String` |
-
-### -InputObject
-
-Target policy from the pipeline.
-
-| Attribute | Value |
-|---|---|
-| Type | `PSCustomObject` |
-| Pipeline | ByValue |
-
-### -TargetPolicyId
+Name of the group to assign to the same policies.
 
 | Attribute | Value |
 |---|---|
 | Type | `String` |
-| Required | Yes (ByTargetId, BySourceId) |
+| Required | Yes |
 
-### -TargetPolicyType
+### -PolicyType
 
-Optional - auto-resolved if omitted.
+Restrict to specific policy types.
+
+| Attribute | Value |
+|---|---|
+| Type | `String[]` |
+| Required | No |
+| Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
+
+### -AssignmentType
+
+Which assignment types to copy. Default: `Include`.
 
 | Attribute | Value |
 |---|---|
 | Type | `String` |
-
-### -Mode
-
-`Replace` (default) overwrites all target assignments. `Merge` adds without removing existing.
-
-| Attribute | Value |
-|---|---|
-| Type | `String` |
-| Default | Replace |
-| Valid values | Replace, Merge |
+| Default | Include |
+| Valid values | Include, Exclude, All |
 
 ### -WhatIf
 
@@ -122,29 +85,42 @@ Prompts for confirmation before performing the action.
 
 | Property | Type | Description |
 |---|---|---|
-| SourcePolicy | String | Source policy name |
-| TargetPolicy | String | Target policy name |
-| AssignmentsCopied | Int | Number of assignments copied |
-| Mode | String | Replace or Merge |
-| Action | String | `AssignmentsCopied` |
+| PolicyName | String | Policy display name |
+| PolicyType | String | Normalised type key |
+| DisplayType | String | Human-readable type label |
+| AssignmentType | String | Include or Exclude |
+| Intent | String | App intent if applicable |
+| SourceGroup | String | Group copied from |
+| TargetGroup | String | Group copied to |
+| Action | String | `AssignmentCopied` |
 
 ## Examples
 
-### Example 1 - Copy to all matching targets
+### Example 1 - Copy all assignments
 
 ```powershell
-$source = Get-LKPolicy -Name "Reference Policy" -NameMatch Exact
-Get-LKPolicy -Name "Contoso*" -NameMatch Wildcard | Copy-LKPolicyAssignment -SourcePolicy $source
+Copy-LKPolicyAssignment -SourceGroup "Pilot Devices" -TargetGroup "Autopilot Pilot Devices"
 ```
 
-### Example 2 - Merge mode
+### Example 2 - Preview with WhatIf
 
 ```powershell
-$source = Get-LKPolicy -Name "Reference Policy" -NameMatch Exact
-Get-LKPolicy -Name "Contoso*" | Copy-LKPolicyAssignment -SourcePolicy $source -Mode Merge
+Copy-LKPolicyAssignment -SourceGroup "Pilot Devices" -TargetGroup "Production Devices" -WhatIf
+```
+
+### Example 3 - Copy only Settings Catalog assignments
+
+```powershell
+Copy-LKPolicyAssignment -SourceGroup "Pilot Devices" -TargetGroup "Production Devices" -PolicyType SettingsCatalog
+```
+
+### Example 4 - Copy both includes and excludes
+
+```powershell
+Copy-LKPolicyAssignment -SourceGroup "Pilot Devices" -TargetGroup "Production Devices" -AssignmentType All
 ```
 
 ## Related
 
-- [Get-LKPolicyAssignment](Get-LKPolicyAssignment.md)
+- [Get-LKGroupAssignment](../groups/Get-LKGroupAssignment.md)
 - [Add-LKPolicyAssignment](Add-LKPolicyAssignment.md)

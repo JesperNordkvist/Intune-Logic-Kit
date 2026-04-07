@@ -1,27 +1,29 @@
 function Copy-LKPolicyAssignment {
     <#
     .SYNOPSIS
-        Copies all assignments from a source policy to one or more target policies.
+        Copies a group's policy assignments to another group.
+    .DESCRIPTION
+        Finds all policies where the source group is assigned, then assigns the target
+        group to those same policies. Optionally filters by policy type. Skips policies
+        where the target group is already assigned.
+
+        By default only explicit group assignments (Include/Exclude) are copied.
+        Broad targets (All Devices, All Users) are not copied as they are tenant-wide.
     .EXAMPLE
-        $source = Get-LKPolicy -Name "Reference Policy" -NameMatch Exact
-        Get-LKPolicy -Name "XW365*" -NameMatch Wildcard | Copy-LKPolicyAssignment -SourcePolicy $source
+        Copy-LKPolicyAssignment -SourceGroup "XW365-Intune-D-Pilot Devices" -TargetGroup "XW365-Intune-D-Autopilot Pilot Devices"
     .EXAMPLE
-        $source = Get-LKPolicy -Name "Reference Policy" -NameMatch Exact
-        Copy-LKPolicyAssignment -SourcePolicy $source -TargetPolicyId 'def-456' -TargetPolicyType CompliancePolicy
+        Copy-LKPolicyAssignment -SourceGroup "Pilot Devices" -TargetGroup "Production Devices" -PolicyType SettingsCatalog, CompliancePolicy
     .EXAMPLE
-        $source = Get-LKPolicy -Name "Reference Policy" -NameMatch Exact
-        Get-LKPolicy -Name "XW365*" | Copy-LKPolicyAssignment -SourcePolicy $source -Mode Merge
+        Copy-LKPolicyAssignment -SourceGroup "Pilot Devices" -TargetGroup "Production Devices" -WhatIf
     #>
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High', DefaultParameterSetName = 'ByPipeline')]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     param(
-        [Parameter(Mandatory, ParameterSetName = 'ByPipeline')]
-        [Parameter(Mandatory, ParameterSetName = 'ByTargetId')]
-        [PSCustomObject]$SourcePolicy,
+        [Parameter(Mandatory)]
+        [string]$SourceGroup,
 
-        [Parameter(Mandatory, ParameterSetName = 'BySourceId')]
-        [string]$SourcePolicyId,
+        [Parameter(Mandatory)]
+        [string]$TargetGroup,
 
-        [Parameter(ParameterSetName = 'BySourceId')]
         [ValidateSet(
             'DeviceConfiguration', 'SettingsCatalog', 'CompliancePolicy', 'EndpointSecurity',
             'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
@@ -29,148 +31,112 @@ function Copy-LKPolicyAssignment {
             'GroupPolicyConfiguration', 'PlatformScript', 'Remediation',
             'DriverUpdate', 'App'
         )]
-        [string]$SourcePolicyType,
+        [string[]]$PolicyType,
 
-        [Parameter(ValueFromPipeline, ParameterSetName = 'ByPipeline')]
-        [PSCustomObject]$InputObject,
-
-        [Parameter(Mandatory, ParameterSetName = 'ByTargetId')]
-        [Parameter(Mandatory, ParameterSetName = 'BySourceId')]
-        [string]$TargetPolicyId,
-
-        [Parameter(ParameterSetName = 'ByTargetId')]
-        [Parameter(ParameterSetName = 'BySourceId')]
-        [ValidateSet(
-            'DeviceConfiguration', 'SettingsCatalog', 'CompliancePolicy', 'EndpointSecurity',
-            'AppProtectionIOS', 'AppProtectionAndroid', 'AppProtectionWindows',
-            'AppConfiguration', 'EnrollmentConfiguration', 'PolicySet',
-            'GroupPolicyConfiguration', 'PlatformScript', 'Remediation',
-            'DriverUpdate', 'App'
-        )]
-        [string]$TargetPolicyType,
-
-        [ValidateSet('Replace', 'Merge')]
-        [string]$Mode = 'Replace'
+        [ValidateSet('Include', 'Exclude', 'All')]
+        [string]$AssignmentType = 'Include'
     )
 
-    begin {
-        Assert-LKSession
+    Assert-LKSession
 
-        if ($SourcePolicy) {
-            $srcId   = $SourcePolicy.Id
-            $srcName = $SourcePolicy.Name
-            $srcTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $SourcePolicy.PolicyType }
-        } elseif ($SourcePolicyType) {
-            $srcId   = $SourcePolicyId
-            $srcName = $SourcePolicyId
-            $srcTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $SourcePolicyType }
-        } else {
-            $resolved = Resolve-LKPolicyTypeById -PolicyId $SourcePolicyId
-            $srcId        = $SourcePolicyId
-            $srcName      = $resolved.PolicyName
-            $srcTypeEntry = $resolved.TypeEntry
+    # Resolve target group upfront so we fail fast if it doesn't exist
+    $targetGroupId = Resolve-LKGroupId -GroupName $TargetGroup
+
+    # Find all policies where the source group is assigned
+    $scanParams = @{ Name = $SourceGroup; NameMatch = 'Exact'; AssignmentType = $AssignmentType }
+    if ($PolicyType) { $scanParams['PolicyType'] = $PolicyType }
+    $scanParams['SkipScopeResolution'] = $true
+
+    Write-Host "  Scanning policies assigned to '$SourceGroup'..." -ForegroundColor Cyan
+    $assignments = @(Get-LKGroupAssignment @scanParams | Where-Object {
+        $_.AssignmentType -in @('Include', 'Exclude')
+    })
+
+    if ($assignments.Count -eq 0) {
+        Write-Warning "No explicit assignments found for '$SourceGroup'."
+        return
+    }
+
+    Write-Host "  Found $($assignments.Count) assignment(s) across $($assignments | Select-Object -Property PolicyId -Unique | Measure-Object | Select-Object -ExpandProperty Count) policies." -ForegroundColor Cyan
+    Write-Host ''
+
+    $copied = 0
+    $skipped = 0
+
+    foreach ($assignment in $assignments) {
+        $typeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $assignment.PolicyType }
+        if (-not $typeEntry) {
+            Write-Warning "Could not resolve policy type '$($assignment.PolicyType)' for '$($assignment.PolicyName)'."
+            continue
         }
 
-        if (-not $srcTypeEntry) {
-            throw "Could not resolve source policy type."
-        }
-
+        # Check if target group is already assigned to this policy
         try {
-            $sourceAssignments = @(Get-LKRawAssignment -PolicyId $srcId -PolicyType $srcTypeEntry)
+            $existingAssignments = @(Get-LKRawAssignment -PolicyId $assignment.PolicyId -PolicyType $typeEntry)
         } catch {
-            throw "Failed to read source assignments from '$srcName': $($_.Exception.Message)"
+            Write-Warning "Failed to read assignments from '$($assignment.PolicyName)': $($_.Exception.Message)"
+            continue
         }
 
-        if ($sourceAssignments.Count -eq 0) {
-            Write-Warning "Source policy '$srcName' has no assignments. Nothing to copy."
+        $alreadyAssigned = $existingAssignments | Where-Object {
+            $_.target.groupId -eq $targetGroupId
+        }
+        if ($alreadyAssigned) {
+            Write-Verbose "Skipping '$($assignment.PolicyName)' - '$TargetGroup' already assigned."
+            $skipped++
+            continue
+        }
+
+        # Build the new assignment matching the source assignment type
+        $odataType = if ($assignment.AssignmentType -eq 'Exclude') {
+            '#microsoft.graph.exclusionGroupAssignmentTarget'
+        } else {
+            '#microsoft.graph.groupAssignmentTarget'
+        }
+
+        $newAssignment = @{
+            target = @{
+                '@odata.type' = $odataType
+                groupId       = $targetGroupId
+            }
+        }
+
+        # Carry over intent for app assignments
+        if ($assignment.Intent) {
+            $newAssignment['intent'] = $assignment.Intent
+        }
+
+        $intentLabel = if ($assignment.Intent) { " ($($assignment.Intent))" } else { '' }
+        Write-LKActionSummary -Action 'COPY ASSIGNMENT' -Details ([ordered]@{
+            Policy = "$($assignment.PolicyName) ($($assignment.DisplayType))"
+            Source = "$SourceGroup ($($assignment.AssignmentType))$intentLabel"
+            Target = "$TargetGroup ($($assignment.AssignmentType))$intentLabel"
+        })
+
+        if ($PSCmdlet.ShouldProcess("$($assignment.PolicyName) ($($assignment.DisplayType))", "Assign '$TargetGroup' ($($assignment.AssignmentType))$intentLabel")) {
+            $updatedAssignments = @($existingAssignments) + @($newAssignment)
+
+            try {
+                Set-LKRawAssignment -PolicyId $assignment.PolicyId -PolicyType $typeEntry -Assignments $updatedAssignments
+                [PSCustomObject]@{
+                    PolicyName     = $assignment.PolicyName
+                    PolicyType     = $assignment.PolicyType
+                    DisplayType    = $assignment.DisplayType
+                    AssignmentType = $assignment.AssignmentType
+                    Intent         = $assignment.Intent
+                    SourceGroup    = $SourceGroup
+                    TargetGroup    = $TargetGroup
+                    Action         = 'AssignmentCopied'
+                }
+                $copied++
+            } catch {
+                Write-Warning "Failed to assign '$TargetGroup' to '$($assignment.PolicyName)': $($_.Exception.Message)"
+            }
         }
     }
 
-    process {
-        if ($sourceAssignments.Count -eq 0) { return }
-
-        if ($InputObject) {
-            $tgtId   = $InputObject.Id
-            $tgtName = $InputObject.Name
-            $tgtTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $InputObject.PolicyType }
-        } elseif ($TargetPolicyType) {
-            $tgtId   = $TargetPolicyId
-            $tgtName = $TargetPolicyId
-            $tgtTypeEntry = $script:LKPolicyTypes | Where-Object { $_.TypeName -eq $TargetPolicyType }
-        } else {
-            try {
-                $resolved = Resolve-LKPolicyTypeById -PolicyId $TargetPolicyId
-                $tgtId        = $TargetPolicyId
-                $tgtName      = $resolved.PolicyName
-                $tgtTypeEntry = $resolved.TypeEntry
-            } catch {
-                Write-Warning $_.Exception.Message
-                return
-            }
-        }
-
-        if (-not $tgtTypeEntry) {
-            Write-Warning "Could not resolve target policy type for '$tgtId'."
-            return
-        }
-
-        if ($srcId -eq $tgtId -and $srcTypeEntry.TypeName -eq $tgtTypeEntry.TypeName) {
-            Write-Warning "Skipping '$tgtName' - same as source policy."
-            return
-        }
-
-        if ($srcTypeEntry.AssignmentMethod -ne $tgtTypeEntry.AssignmentMethod) {
-            Write-Warning "Cannot copy from '$srcName' ($($srcTypeEntry.AssignmentMethod)) to '$tgtName' ($($tgtTypeEntry.AssignmentMethod)) - incompatible assignment methods."
-            return
-        }
-
-        $assignmentsToWrite = $sourceAssignments
-
-        if ($Mode -eq 'Merge') {
-            try {
-                $existingTarget = @(Get-LKRawAssignment -PolicyId $tgtId -PolicyType $tgtTypeEntry)
-            } catch {
-                Write-Warning "Failed to read existing assignments from '$tgtName': $($_.Exception.Message)"
-                return
-            }
-
-            $merged = [System.Collections.ArrayList]@($existingTarget)
-            foreach ($srcAssignment in $sourceAssignments) {
-                $srcGroupId   = $srcAssignment.target.groupId
-                $srcOdataType = $srcAssignment.target.'@odata.type'
-
-                $isDuplicate = $existingTarget | Where-Object {
-                    $_.target.groupId -eq $srcGroupId -and
-                    $_.target.'@odata.type' -eq $srcOdataType
-                }
-
-                if (-not $isDuplicate) {
-                    $merged.Add($srcAssignment) | Out-Null
-                }
-            }
-            $assignmentsToWrite = @($merged)
-        }
-
-        Write-LKActionSummary -Action 'COPY ASSIGNMENTS' -Details ([ordered]@{
-            Source      = "$srcName ($($srcTypeEntry.DisplayName))"
-            Target      = "$tgtName ($($tgtTypeEntry.DisplayName))"
-            Assignments = "$($sourceAssignments.Count) assignment(s)"
-            Mode        = $Mode
-        })
-
-        if ($PSCmdlet.ShouldProcess("$tgtName ($($tgtTypeEntry.DisplayName))", "Copy $($sourceAssignments.Count) assignment(s) from '$srcName' ($Mode mode)")) {
-            try {
-                Set-LKRawAssignment -PolicyId $tgtId -PolicyType $tgtTypeEntry -Assignments $assignmentsToWrite
-                [PSCustomObject]@{
-                    SourcePolicy      = $srcName
-                    TargetPolicy      = $tgtName
-                    AssignmentsCopied = $sourceAssignments.Count
-                    Mode              = $Mode
-                    Action            = 'AssignmentsCopied'
-                }
-            } catch {
-                Write-Warning "Failed to write assignments to '$tgtName': $($_.Exception.Message)"
-            }
-        }
+    if ($copied -gt 0 -or $skipped -gt 0) {
+        Write-Host ''
+        Write-Host "  Done: $copied copied, $skipped skipped (already assigned)." -ForegroundColor Green
     }
 }

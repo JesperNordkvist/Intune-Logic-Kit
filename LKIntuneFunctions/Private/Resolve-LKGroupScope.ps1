@@ -50,5 +50,13 @@ function Resolve-LKGroupScope {
     if ($hasDevices -and $hasUsers) { return 'Both' }
     if ($hasDevices) { return 'Device' }
     if ($hasUsers)   { return 'User' }
+
+    # Fallback: infer scope from group naming convention
+    $groupName = $group.displayName
+    if ($groupName) {
+        if ($groupName -match '[-–]\s*U\s*[-–]') { return 'User' }
+        if ($groupName -match '[-–]\s*[DC]\s*[-–]') { return 'Device' }
+    }
+
     return 'Unknown'
 }
