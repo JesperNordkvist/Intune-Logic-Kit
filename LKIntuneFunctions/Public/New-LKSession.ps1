@@ -83,4 +83,7 @@ function New-LKSession {
         Account     = $script:LKSession.Account
         ConnectedAt = $script:LKSession.ConnectedAt
     }
+
+    # Non-blocking check for newer releases
+    Test-LKModuleVersion
 }

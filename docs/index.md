@@ -14,6 +14,23 @@ Manage policies, assignments, groups, devices, and users from the command line w
 
 ---
 
+## Installation
+
+Download the latest release and import the module:
+
+```powershell
+# Option 1 - Download the latest release zip from GitHub
+# https://github.com/JesperNordkvist/Lowkey-Intune-Functions/releases/latest
+
+# Option 2 - Clone the repository
+git clone https://github.com/JesperNordkvist/Lowkey-Intune-Functions.git
+
+# Import the module
+Import-Module .\LKIntuneFunctions\LKIntuneFunctions.psd1
+```
+
+The module checks for updates automatically when you run `New-LKSession`.
+
 ## Quick Start
 
 ```powershell
