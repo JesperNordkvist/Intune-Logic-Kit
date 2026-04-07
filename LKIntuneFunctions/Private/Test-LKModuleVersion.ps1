@@ -16,7 +16,7 @@ function Test-LKModuleVersion {
         if ($latestVersion -gt $currentVersion) {
             Write-Host ''
             Write-Host "  Update available: v$latestVersion (installed: v$currentVersion)" -ForegroundColor Yellow
-            Write-Host "  Download: $($releaseInfo.html_url)" -ForegroundColor Yellow
+            Write-Host "  Run Update-LKModule to update, or download from: $($releaseInfo.html_url)" -ForegroundColor Yellow
             Write-Host ''
         }
     } catch {

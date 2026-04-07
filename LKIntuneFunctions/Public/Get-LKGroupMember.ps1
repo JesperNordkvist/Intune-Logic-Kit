@@ -8,6 +8,8 @@ function Get-LKGroupMember {
         Get-LKGroup -Name 'SG-Test*' -NameMatch Wildcard | Get-LKGroupMember
     .EXAMPLE
         Get-LKGroupMember -GroupName 'SG-Intune-TestDevices' -MemberType Device
+    .EXAMPLE
+        Get-LKGroupMember -GroupName 'SG-Intune-TestDevices' -DisplayAs Table
     #>
     [CmdletBinding(DefaultParameterSetName = 'ByName')]
     param(
@@ -21,11 +23,15 @@ function Get-LKGroupMember {
         [PSCustomObject]$InputObject,
 
         [ValidateSet('All', 'Device', 'User')]
-        [string]$MemberType = 'All'
+        [string]$MemberType = 'All',
+
+        [ValidateSet('List', 'Table')]
+        [string]$DisplayAs = 'List'
     )
 
     begin {
         Assert-LKSession
+        if ($DisplayAs -eq 'Table') { $collector = [System.Collections.Generic.List[object]]::new() }
     }
 
     process {
@@ -75,7 +81,7 @@ function Get-LKGroupMember {
 
             if ($MemberType -ne 'All' -and $type -ne $MemberType) { continue }
 
-            [PSCustomObject]@{
+            $obj = [PSCustomObject]@{
                 PSTypeName        = 'LKGroupMember'
                 GroupName         = $resolvedGroupName
                 GroupId           = $resolvedGroupId
@@ -86,6 +92,13 @@ function Get-LKGroupMember {
                 DeviceId          = if ($type -eq 'Device') { $member.deviceId } else { $null }
                 OS                = if ($type -eq 'Device') { $member.operatingSystem } else { $null }
             }
+            if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
+        }
+    }
+
+    end {
+        if ($DisplayAs -eq 'Table' -and $collector.Count -gt 0) {
+            $collector | Format-Table DisplayName, MemberType, UserPrincipalName, OS -AutoSize
         }
     }
 }

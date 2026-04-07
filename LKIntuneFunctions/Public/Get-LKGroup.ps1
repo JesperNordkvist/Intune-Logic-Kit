@@ -6,6 +6,8 @@ function Get-LKGroup {
         Get-LKGroup -Name "SG-Windows-*" -NameMatch Wildcard
     .EXAMPLE
         Get-LKGroup -Name "TestGroup" -NameMatch Exact
+    .EXAMPLE
+        Get-LKGroup -Name "SG-Intune" -DisplayAs Table
     #>
     [CmdletBinding()]
     param(
@@ -14,10 +16,15 @@ function Get-LKGroup {
         [ValidateSet('Contains', 'Exact', 'Wildcard', 'Regex')]
         [string]$NameMatch = 'Contains',
 
-        [scriptblock]$FilterScript
+        [scriptblock]$FilterScript,
+
+        [ValidateSet('List', 'Table')]
+        [string]$DisplayAs = 'List'
     )
 
     Assert-LKSession
+
+    if ($DisplayAs -eq 'Table') { $collector = [System.Collections.Generic.List[object]]::new() }
 
     $selectFields = 'id,displayName,description,groupTypes,membershipRule,membershipRuleProcessingState'
     $clientSideFilter = $false
@@ -68,6 +75,10 @@ function Get-LKGroup {
             continue
         }
 
-        $obj
+        if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
+    }
+
+    if ($DisplayAs -eq 'Table' -and $collector.Count -gt 0) {
+        $collector | Format-Table Name, GroupType, MembershipType, Description -AutoSize
     }
 }

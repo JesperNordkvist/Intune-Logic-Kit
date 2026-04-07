@@ -8,6 +8,8 @@ function Get-LKDevice {
         Get-LKDevice -User "Jesper Nordkvist" -NameMatch Contains
     .EXAMPLE
         Get-LKDevice -User "Jesper" -NameMatch Contains -OS Windows
+    .EXAMPLE
+        Get-LKDevice -User "Jesper" -DisplayAs Table
     #>
     [CmdletBinding()]
     param(
@@ -24,10 +26,15 @@ function Get-LKDevice {
         [ValidateSet('Windows', 'iOS', 'Android', 'macOS')]
         [string]$OS,
 
-        [scriptblock]$FilterScript
+        [scriptblock]$FilterScript,
+
+        [ValidateSet('List', 'Table')]
+        [string]$DisplayAs = 'List'
     )
 
     Assert-LKSession
+
+    if ($DisplayAs -eq 'Table') { $collector = [System.Collections.Generic.List[object]]::new() }
 
     $selectFields = 'id,deviceName,userDisplayName,userPrincipalName,operatingSystem,osVersion,' +
                     'complianceState,managementState,enrolledDateTime,lastSyncDateTime,' +
@@ -101,6 +108,10 @@ function Get-LKDevice {
             continue
         }
 
-        $obj
+        if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
+    }
+
+    if ($DisplayAs -eq 'Table' -and $collector.Count -gt 0) {
+        $collector | Format-Table DeviceName, UserDisplayName, OS, ComplianceState, LastSyncDateTime -AutoSize
     }
 }

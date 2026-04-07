@@ -8,6 +8,8 @@ function Get-LKUser {
         Get-LKUser -Name "jesper@contoso.com" -NameMatch Exact
     .EXAMPLE
         Get-LKUser -Department "IT"
+    .EXAMPLE
+        Get-LKUser -Department "IT" -DisplayAs Table
     #>
     [CmdletBinding()]
     param(
@@ -18,10 +20,15 @@ function Get-LKUser {
 
         [string]$Department,
 
-        [scriptblock]$FilterScript
+        [scriptblock]$FilterScript,
+
+        [ValidateSet('List', 'Table')]
+        [string]$DisplayAs = 'List'
     )
 
     Assert-LKSession
+
+    if ($DisplayAs -eq 'Table') { $collector = [System.Collections.Generic.List[object]]::new() }
 
     $selectFields = 'id,displayName,userPrincipalName,mail,jobTitle,department,accountEnabled'
     $clientSideNameFilter = $false
@@ -85,6 +92,10 @@ function Get-LKUser {
             continue
         }
 
-        $obj
+        if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
+    }
+
+    if ($DisplayAs -eq 'Table' -and $collector.Count -gt 0) {
+        $collector | Format-Table DisplayName, UserPrincipalName, Department, JobTitle -AutoSize
     }
 }

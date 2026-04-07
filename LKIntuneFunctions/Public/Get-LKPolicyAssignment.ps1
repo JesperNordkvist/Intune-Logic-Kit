@@ -6,6 +6,8 @@ function Get-LKPolicyAssignment {
         Get-LKPolicy -Name "XW365" | Get-LKPolicyAssignment
     .EXAMPLE
         Get-LKPolicyAssignment -PolicyId 'abc-123' -PolicyType SettingsCatalog
+    .EXAMPLE
+        Get-LKPolicy -Name "XW365" | Get-LKPolicyAssignment -DisplayAs Table
     #>
     [CmdletBinding(DefaultParameterSetName = 'ByPipeline')]
     param(
@@ -23,12 +25,16 @@ function Get-LKPolicyAssignment {
         [string]$PolicyType,
 
         [Parameter(ValueFromPipeline, ParameterSetName = 'ByPipeline')]
-        [PSCustomObject]$InputObject
+        [PSCustomObject]$InputObject,
+
+        [ValidateSet('List', 'Table')]
+        [string]$DisplayAs = 'List'
     )
 
     begin {
         Assert-LKSession
         $groupNameCache = @{}
+        if ($DisplayAs -eq 'Table') { $collector = [System.Collections.Generic.List[object]]::new() }
     }
 
     process {
@@ -102,7 +108,7 @@ function Get-LKPolicyAssignment {
             $filterType = $target.deviceAndAppManagementAssignmentFilterType
             $filterId   = $target.deviceAndAppManagementAssignmentFilterId
 
-            [PSCustomObject]@{
+            $obj = [PSCustomObject]@{
                 PSTypeName     = 'LKPolicyAssignment'
                 PolicyId       = $id
                 PolicyName     = $name
@@ -114,6 +120,13 @@ function Get-LKPolicyAssignment {
                 FilterId       = $filterId
                 Intent         = $assignment.intent
             }
+            if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
+        }
+    }
+
+    end {
+        if ($DisplayAs -eq 'Table' -and $collector.Count -gt 0) {
+            $collector | Format-Table AssignmentType, GroupName, Intent -AutoSize
         }
     }
 }

@@ -37,7 +37,10 @@ function Test-LKPolicyAssignment {
         [ValidateSet('Contains', 'Exact', 'Wildcard', 'Regex')]
         [string]$NameMatch = 'Contains',
 
-        [switch]$Detailed
+        [switch]$Detailed,
+
+        [ValidateSet('List', 'Table')]
+        [string]$DisplayAs = 'List'
     )
 
     Assert-LKSession
@@ -312,5 +315,9 @@ function Test-LKPolicyAssignment {
     }
 
     # Always emit objects to the pipeline (even in -Detailed mode, for capture)
-    $issues
+    if ($DisplayAs -eq 'Table') {
+        $issues | Format-Table PolicyName, PolicyScope, GroupName, GroupScope, Severity -AutoSize
+    } else {
+        $issues
+    }
 }

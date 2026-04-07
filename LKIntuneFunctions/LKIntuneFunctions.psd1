@@ -1,6 +1,5 @@
 @{
     RootModule        = 'LKIntuneFunctions.psm1'
-    FormatsToProcess  = @('LKIntuneFunctions.Format.ps1xml')
     ModuleVersion     = '0.1.0'
     GUID              = 'a3f7b2c1-9d4e-4a8f-b6e5-1c3d7f9a2b4e'
     Author            = 'Jesper Nordkvist'
@@ -35,6 +34,7 @@
         'Show-LKPolicyDetail'
         'Test-LKPolicyAssignment'
         'Get-LKPolicyOverview'
+        'Update-LKModule'
     )
     CmdletsToExport   = @()
     VariablesToExport  = @()

@@ -40,6 +40,9 @@ function Get-LKGroupAssignment {
     .EXAMPLE
         Get-LKGroupAssignment -Name 'Pilot Devices' -AssignmentType All
         Shows both include and exclude assignments for the group.
+    .EXAMPLE
+        Get-LKGroupAssignment -Name 'Pilot Devices' -DisplayAs Table
+        Shows results as a compact table.
     #>
     [CmdletBinding(DefaultParameterSetName = 'ByName')]
     param(
@@ -65,10 +68,15 @@ function Get-LKGroupAssignment {
         [switch]$SkipScopeResolution,
 
         [ValidateSet('Include', 'Exclude', 'All')]
-        [string]$AssignmentType = 'Include'
+        [string]$AssignmentType = 'Include',
+
+        [ValidateSet('List', 'Table')]
+        [string]$DisplayAs = 'List'
     )
 
     Assert-LKSession
+
+    if ($DisplayAs -eq 'Table') { $collector = [System.Collections.Generic.List[object]]::new() }
 
     # Resolve target group(s)
     $targetGroups = @()
@@ -224,7 +232,7 @@ function Get-LKGroupAssignment {
                     $policyScope -ne $gScope
                 } else { $null }
 
-                [PSCustomObject]@{
+                $obj = [PSCustomObject]@{
                     PSTypeName     = 'LKGroupAssignment'
                     PolicyId       = $policy.id
                     PolicyName     = $policyName
@@ -238,6 +246,7 @@ function Get-LKGroupAssignment {
                     ScopeMismatch  = $mismatch
                     Intent         = $match.Intent
                 }
+                if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
             }
 
             # Check broad targets: does "All Devices" / "All Users" implicitly cover any target group?
@@ -251,8 +260,7 @@ function Get-LKGroupAssignment {
 
                     $gScope = $groupScopes[$g.Id]
 
-                    # Skip broad target matching when group scope is unknown — we can't
-                    # confirm the group would be covered, so avoid false positives
+                    # Skip broad target matching when group scope is unknown
                     if ($gScope -eq 'Unknown') { continue }
 
                     foreach ($broad in $broadTargets) {
@@ -269,7 +277,6 @@ function Get-LKGroupAssignment {
                         }
 
                         if ($applies) {
-                            # For broad targets, check mismatch between policy scope and the broad target's implied scope
                             $broadImpliedScope = switch ($broad.Type) {
                                 'AllDevices'       { 'Device' }
                                 'AllUsers'         { 'User' }
@@ -279,7 +286,7 @@ function Get-LKGroupAssignment {
                                 $policyScope -ne $broadImpliedScope
                             } else { $null }
 
-                            [PSCustomObject]@{
+                            $obj = [PSCustomObject]@{
                                 PSTypeName     = 'LKGroupAssignment'
                                 PolicyId       = $policy.id
                                 PolicyName     = $policyName
@@ -293,6 +300,7 @@ function Get-LKGroupAssignment {
                                 ScopeMismatch  = $mismatch
                                 Intent         = $broad.Intent
                             }
+                            if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
                             break
                         }
                     }
@@ -302,4 +310,8 @@ function Get-LKGroupAssignment {
     }
 
     Write-Progress -Activity "Scanning assignments for $groupLabel" -Completed
+
+    if ($DisplayAs -eq 'Table' -and $collector.Count -gt 0) {
+        $collector | Format-Table PolicyName, DisplayType, AssignmentType, PolicyScope, Intent -AutoSize
+    }
 }

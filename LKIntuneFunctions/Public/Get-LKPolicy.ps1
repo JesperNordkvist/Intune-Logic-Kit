@@ -14,6 +14,9 @@ function Get-LKPolicy {
     .EXAMPLE
         Get-LKPolicy -Name "Baseline" -IncludeSettings
         Returns policies with their configured settings attached as a Settings property.
+    .EXAMPLE
+        Get-LKPolicy -Name "Baseline" -DisplayAs Table
+        Shows results as a compact table.
     #>
     [CmdletBinding()]
     param(
@@ -35,10 +38,15 @@ function Get-LKPolicy {
 
         [switch]$IncludeSettings,
 
-        [scriptblock]$FilterScript
+        [scriptblock]$FilterScript,
+
+        [ValidateSet('List', 'Table')]
+        [string]$DisplayAs = 'List'
     )
 
     Assert-LKSession
+
+    if ($DisplayAs -eq 'Table') { $collector = [System.Collections.Generic.List[object]]::new() }
 
     $types = if ($PolicyType) {
         $script:LKPolicyTypes | Where-Object { $_.TypeName -in $PolicyType }
@@ -95,9 +103,13 @@ function Get-LKPolicy {
                 $obj | Add-Member -NotePropertyName 'Settings' -NotePropertyValue $settings
             }
 
-            $obj
+            if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
         }
     }
 
     Write-Progress -Activity 'Querying Intune policies' -Completed
+
+    if ($DisplayAs -eq 'Table' -and $collector.Count -gt 0) {
+        $collector | Format-Table Name, DisplayType, TargetScope, ModifiedAt -AutoSize
+    }
 }
