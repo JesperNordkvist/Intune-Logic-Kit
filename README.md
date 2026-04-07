@@ -77,7 +77,7 @@ The following delegated scopes are requested during `New-LKSession`:
 
 ## Documentation
 
-Full function reference and examples: [Docs/Index.md](Docs/Index.md)
+Full function reference and examples: [https://jespernordkvist.github.io/Lowkey-Intune-Functions/](https://jespernordkvist.github.io/Lowkey-Intune-Functions/)
 
 ## License
 
