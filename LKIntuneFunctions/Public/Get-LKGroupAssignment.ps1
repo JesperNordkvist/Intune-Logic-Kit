@@ -262,18 +262,17 @@ function Get-LKGroupAssignment {
 
                     $gScope = $groupScopes[$g.Id]
 
-                    # Skip broad target matching when group scope is unknown -
-                    # can't confirm the group would be covered
-                    if ($gScope -eq 'Unknown') { continue }
-
                     foreach ($broad in $broadTargets) {
-                        # Only show broad targets that actually apply to this group's scope
-                        $applies = switch ($broad.Type) {
-                            'AllDevices'       { $gScope -in @('Device', 'Both'); break }
-                            'AllUsers'         { $gScope -in @('User', 'Both'); break }
-                            'AllLicensedUsers' { $gScope -in @('User', 'Both'); break }
+                        # When group scope is known, only show broad targets that apply
+                        # When unknown, show all (can't determine which apply)
+                        if ($gScope -notin @('Unknown', 'Both')) {
+                            $applies = switch ($broad.Type) {
+                                'AllDevices'       { $gScope -eq 'Device'; break }
+                                'AllUsers'         { $gScope -eq 'User'; break }
+                                'AllLicensedUsers' { $gScope -eq 'User'; break }
+                            }
+                            if (-not $applies) { continue }
                         }
-                        if (-not $applies) { continue }
 
                         $broadImpliedScope = switch ($broad.Type) {
                             'AllDevices'       { 'Device'; break }
