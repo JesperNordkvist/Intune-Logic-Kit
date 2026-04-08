@@ -1,7 +1,7 @@
 function Get-LKSession {
     <#
     .SYNOPSIS
-        Returns the current LKIntuneFunctions session info.
+        Returns the current Intune Logic Kit session info.
     .DESCRIPTION
         Shows the tenant, account, and connection details for the active session.
         Attempts to restore a previous session if the Graph token cache is still valid.

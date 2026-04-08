@@ -1,7 +1,7 @@
 function Update-LKModule {
     <#
     .SYNOPSIS
-        Downloads and installs the latest release of LKIntuneFunctions from GitHub.
+        Downloads and installs the latest release of Intune Logic Kit from GitHub.
     .DESCRIPTION
         Checks GitHub for the latest release, downloads the zip, extracts it over the
         current module directory, and prompts the user to re-import the module.
@@ -43,7 +43,7 @@ function Update-LKModule {
         return
     }
 
-    if (-not $PSCmdlet.ShouldProcess("LKIntuneFunctions v$currentVersion -> v$latestVersion", 'Update module')) {
+    if (-not $PSCmdlet.ShouldProcess("Intune Logic Kit v$currentVersion -> v$latestVersion", 'Update module')) {
         return
     }
 

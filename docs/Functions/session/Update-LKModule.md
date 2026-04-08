@@ -5,7 +5,7 @@ nav_order: 28
 
 # Update-LKModule
 
-Downloads and installs the latest release of LKIntuneFunctions from GitHub.
+Downloads and installs the latest release of Intune Logic Kit from GitHub.
 
 ## Syntax
 

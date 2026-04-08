@@ -1,4 +1,4 @@
-# LKIntuneFunctions
+# Intune Logic Kit
 
 PowerShell module for Microsoft Intune administration via the Microsoft Graph API. Built to simplify bulk policy management, assignment auditing, and day-to-day Intune operations.
 

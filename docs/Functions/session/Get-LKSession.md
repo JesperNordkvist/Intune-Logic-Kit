@@ -5,7 +5,7 @@ nav_order: 15
 
 # Get-LKSession
 
-Returns the current LKIntuneFunctions session info.
+Returns the current Intune Logic Kit session info.
 
 ## Syntax
 

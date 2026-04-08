@@ -4,7 +4,7 @@ layout: home
 nav_order: 1
 ---
 
-# LKIntuneFunctions
+# Intune Logic Kit
 {: .fs-9 }
 
 A PowerShell module for managing Microsoft Intune via the Graph API.
