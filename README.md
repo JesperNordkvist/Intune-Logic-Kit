@@ -9,6 +9,7 @@ PowerShell module for Microsoft Intune administration via the Microsoft Graph AP
 - **Assignment Auditing** - Detect mismatched assignments (e.g., user-scoped policies assigned to device groups) across your entire tenant
 - **Group Operations** - Create, rename, delete groups; manage members; reverse-lookup which policies target a group
 - **Device & User Lookups** - Query devices and users, view detailed device info, trigger remote actions (Sync, Restart, Wipe)
+- **Setting Search** - Search across all policy types to find which policies configure a specific setting
 - **Scope Resolution** - Automatically resolves policy scope (User/Device) via Graph metadata for accurate mismatch detection
 
 ## Quick Start
@@ -74,6 +75,12 @@ The following delegated scopes are requested during `New-LKSession`:
 | `DeviceManagementServiceConfig.ReadWrite.All` | Enrollment configs, policy sets |
 | `DeviceManagementRBAC.ReadWrite.All` | Scope tag resolution |
 | `Organization.Read.All` | Tenant display name |
+
+## Planned Features
+
+- **Tab Completion** - Custom argument completers for `-PolicyType`, `-PolicyName`, and other parameters for IntelliSense support
+- **Compare-LKPolicySetting** - Side-by-side comparison of settings between two or more policies to identify configuration drift
+- **Export-LKPolicy** - Export policies and their settings to JSON/CSV for documentation, auditing, or migration
 
 ## Documentation
 
