@@ -254,7 +254,7 @@ function Get-LKGroupAssignment {
                     ScopeMismatch  = $mismatch
                     Intent         = $match.Intent
                     FilterId       = $match.FilterId
-                    FilterName     = $filterNames[$match.FilterId]
+                    FilterName     = if ($match.FilterId) { $filterNames[$match.FilterId] } else { $null }
                     FilterType     = $match.FilterType
                 }
                 if ($DisplayAs -eq 'Table') { $collector.Add($obj) } else { $obj }
