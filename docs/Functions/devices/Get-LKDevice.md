@@ -101,7 +101,8 @@ Controls output format. Default shows full object properties (List). Table shows
 | Model | String | Hardware model |
 | Manufacturer | String | Hardware manufacturer |
 | SerialNumber | String | Serial number |
-| AzureADDeviceId | String | Entra device ID |
+| AzureADDeviceId | String | Entra device registration ID |
+| EntraObjectId | String | Entra directory object ID (for bulk actions, group operations) |
 
 ## Examples
 

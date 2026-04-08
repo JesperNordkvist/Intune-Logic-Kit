@@ -50,6 +50,13 @@ function Get-LKDeviceDetail {
             return
         }
 
+        # Resolve Entra Object ID from azureADDeviceId
+        $entraObjectId = $null
+        if ($device.azureADDeviceId) {
+            $entraIdMap = Resolve-LKEntraObjectId -DeviceIds @($device.azureADDeviceId)
+            $entraObjectId = $entraIdMap[$device.azureADDeviceId]
+        }
+
         # Fetch compliance and configuration states
         $complianceStates = @()
         $configStates     = @()
@@ -80,6 +87,7 @@ function Get-LKDeviceDetail {
             Manufacturer            = $device.manufacturer
             SerialNumber            = $device.serialNumber
             AzureADDeviceId         = $device.azureADDeviceId
+            EntraObjectId           = $entraObjectId
             EnrollmentType          = $device.deviceEnrollmentType
             JoinType                = $device.joinType
             Ownership               = $device.managedDeviceOwnerType

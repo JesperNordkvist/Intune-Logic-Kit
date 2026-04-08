@@ -62,7 +62,8 @@ A device object from `Get-LKDevice`. Accepted from the pipeline.
 | Model | String | Hardware model |
 | Manufacturer | String | Manufacturer |
 | SerialNumber | String | Serial number |
-| AzureADDeviceId | String | Entra device ID |
+| AzureADDeviceId | String | Entra device registration ID |
+| EntraObjectId | String | Entra directory object ID (for bulk actions, group operations) |
 | EnrollmentType | String | How the device was enrolled |
 | JoinType | String | Azure AD join type |
 | Ownership | String | Corporate or Personal |

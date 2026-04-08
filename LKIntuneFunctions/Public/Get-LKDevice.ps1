@@ -75,6 +75,8 @@ function Get-LKDevice {
 
     if (-not $devices) { return }
 
+    # Client-side filtering pass
+    $filtered = @()
     foreach ($device in $devices) {
         if ($clientSideNameFilter -and -not (Test-LKNameMatch -Value $device.deviceName -Name $Name -NameMatch $NameMatch)) {
             continue
@@ -86,22 +88,32 @@ function Get-LKDevice {
             if (-not $userMatched) { continue }
         }
 
+        $filtered += $device
+    }
+
+    if ($filtered.Count -eq 0) { return }
+
+    # Batch-resolve Entra Object IDs from azureADDeviceId values
+    $entraIdMap = Resolve-LKEntraObjectId -DeviceIds @($filtered | ForEach-Object { $_.azureADDeviceId } | Where-Object { $_ })
+
+    foreach ($device in $filtered) {
         $obj = [PSCustomObject]@{
-            PSTypeName       = 'LKDevice'
-            Id               = $device.id
-            DeviceName       = $device.deviceName
-            UserDisplayName  = $device.userDisplayName
+            PSTypeName        = 'LKDevice'
+            Id                = $device.id
+            DeviceName        = $device.deviceName
+            UserDisplayName   = $device.userDisplayName
             UserPrincipalName = $device.userPrincipalName
-            OS               = $device.operatingSystem
-            OSVersion        = $device.osVersion
-            ComplianceState  = $device.complianceState
-            ManagementState  = $device.managementState
-            EnrolledDateTime = $device.enrolledDateTime
-            LastSyncDateTime = $device.lastSyncDateTime
-            Model            = $device.model
-            Manufacturer     = $device.manufacturer
-            SerialNumber     = $device.serialNumber
-            AzureADDeviceId  = $device.azureADDeviceId
+            OS                = $device.operatingSystem
+            OSVersion         = $device.osVersion
+            ComplianceState   = $device.complianceState
+            ManagementState   = $device.managementState
+            EnrolledDateTime  = $device.enrolledDateTime
+            LastSyncDateTime  = $device.lastSyncDateTime
+            Model             = $device.model
+            Manufacturer      = $device.manufacturer
+            SerialNumber      = $device.serialNumber
+            AzureADDeviceId   = $device.azureADDeviceId
+            EntraObjectId     = $entraIdMap[$device.azureADDeviceId]
         }
 
         if ($FilterScript -and -not ($obj | Where-Object $FilterScript)) {
