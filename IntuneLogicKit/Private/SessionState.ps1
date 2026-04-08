@@ -12,6 +12,8 @@ $script:LKSessionPath = Join-Path ([Environment]::GetFolderPath('LocalApplicatio
 $script:LKGitHubRepo = 'JesperNordkvist/Intune-Logic-Kit'
 
 $script:LKFilterNameCache = @{}
+$script:LKPolicyNameCache = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+$script:LKGroupNameCache  = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 
 $script:LKRequiredScopes = @(
     'DeviceManagementConfiguration.ReadWrite.All'

@@ -70,6 +70,7 @@ function Get-LKGroup {
             MembershipType = $membershipType
             MembershipRule = $group.membershipRule
         }
+        if ($obj.Name) { $script:LKGroupNameCache.Add($obj.Name) | Out-Null }
 
         if ($FilterScript -and -not ($obj | Where-Object $FilterScript)) {
             continue

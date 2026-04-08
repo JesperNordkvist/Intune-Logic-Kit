@@ -84,6 +84,35 @@ function New-LKSession {
         ConnectedAt = $script:LKSession.ConnectedAt
     }
 
+    # Preload name caches for tab completion
+    Write-Host ''
+    Write-Host '  Scanning environment...' -ForegroundColor DarkGray -NoNewline
+
+    try {
+        # Groups — single lightweight call
+        $groups = Invoke-LKGraphRequest -Method GET -Uri '/groups?$select=displayName&$top=999' -ApiVersion 'v1.0' -All
+        foreach ($g in $groups) {
+            if ($g.displayName) { $script:LKGroupNameCache.Add($g.displayName) | Out-Null }
+        }
+
+        # Policies — one call per type
+        foreach ($type in $script:LKPolicyTypes) {
+            try {
+                $policies = Invoke-LKGraphRequest -Method GET -Uri "$($type.Endpoint)?`$select=$($type.NameProperty)" -ApiVersion $type.ApiVersion -All
+                foreach ($p in $policies) {
+                    $name = $p.($type.NameProperty)
+                    if ($name) { $script:LKPolicyNameCache.Add($name) | Out-Null }
+                }
+            } catch {
+                # Non-critical — skip types that fail
+            }
+        }
+
+        Write-Host " $($script:LKPolicyNameCache.Count) policies, $($script:LKGroupNameCache.Count) groups cached." -ForegroundColor DarkGray
+    } catch {
+        Write-Host ' (cache preload failed — tab completion will populate on first query)' -ForegroundColor DarkGray
+    }
+
     # Non-blocking check for newer releases
     Test-LKModuleVersion
 }

@@ -85,6 +85,7 @@ function Get-LKPolicy {
             }
 
             $obj = ConvertTo-LKPolicyObject -RawPolicy $raw -PolicyType $type -ResolvedScope $resolvedScope
+            if ($obj.Name) { $script:LKPolicyNameCache.Add($obj.Name) | Out-Null }
 
             if ($FilterScript -and -not ($obj | Where-Object $FilterScript)) {
                 continue

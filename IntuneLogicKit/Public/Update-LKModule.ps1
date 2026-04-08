@@ -77,16 +77,20 @@ function Update-LKModule {
 
         $savedSession = if ($script:LKSession) { $script:LKSession.Clone() } else { $null }
         $savedFilterCache = if ($script:LKFilterNameCache) { $script:LKFilterNameCache.Clone() } else { @{} }
+        $savedPolicyNames = if ($script:LKPolicyNameCache) { [System.Collections.Generic.HashSet[string]]::new($script:LKPolicyNameCache) } else { $null }
+        $savedGroupNames  = if ($script:LKGroupNameCache)  { [System.Collections.Generic.HashSet[string]]::new($script:LKGroupNameCache)  } else { $null }
 
         Import-Module "$moduleRoot\IntuneLogicKit.psd1" -Force -Global
 
         # Restore session state into the reloaded module
         if ($savedSession) {
             & (Get-Module IntuneLogicKit) {
-                param($s, $fc)
+                param($s, $fc, $pn, $gn)
                 $script:LKSession = $s
                 $script:LKFilterNameCache = $fc
-            } $savedSession $savedFilterCache
+                if ($pn) { $script:LKPolicyNameCache = $pn }
+                if ($gn) { $script:LKGroupNameCache = $gn }
+            } $savedSession $savedFilterCache $savedPolicyNames $savedGroupNames
         }
 
         Write-Progress -Activity 'Updating Intune Logic Kit' -Completed

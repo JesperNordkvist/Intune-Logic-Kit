@@ -1,6 +1,6 @@
 @{
     RootModule        = 'IntuneLogicKit.psm1'
-    ModuleVersion     = '0.2.1'
+    ModuleVersion     = '0.3.0'
     GUID              = 'a3f7b2c1-9d4e-4a8f-b6e5-1c3d7f9a2b4e'
     Author            = 'Jesper Nordkvist'
     Description       = 'Intune Logic Kit - PowerShell module for Intune management via Microsoft Graph.'
@@ -36,6 +36,10 @@
         'Update-LKModule'
         'Get-LKAssignmentFilter'
         'Search-LKSetting'
+        'Compare-LKPolicySetting'
+        'Compare-LKDevice'
+        'Export-LKPolicy'
+        'Test-LKPolicyConflict'
     )
     CmdletsToExport   = @()
     VariablesToExport  = @()

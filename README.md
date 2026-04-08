@@ -10,6 +10,11 @@ PowerShell module for Microsoft Intune administration via the Microsoft Graph AP
 - **Group Operations** - Create, rename, delete groups; manage members; reverse-lookup which policies target a group
 - **Device & User Lookups** - Query devices and users, view detailed device info, trigger remote actions (Sync, Restart, Wipe)
 - **Setting Search** - Search across all policy types to find which policies configure a specific setting
+- **Policy Comparison** - Compare settings side by side across policies to identify configuration drift
+- **Device Comparison** - Compare devices to detect drift in OS versions, installed apps, and configurations
+- **Conflict Detection** - Detect policies with overlapping settings assigned to the same groups
+- **Export** - Export policies and settings to JSON or CSV for documentation, auditing, or migration
+- **Tab Completion** - Auto-complete policy and group names across all commands after initial connection
 - **Scope Resolution** - Automatically resolves policy scope (User/Device) via Graph metadata for accurate mismatch detection
 
 ## Quick Start
@@ -79,10 +84,7 @@ The following delegated scopes are requested during `New-LKSession`:
 
 ## Planned Features
 
-- **Tab Completion** - Custom argument completers for `-PolicyType`, `-PolicyName`, and other parameters for IntelliSense support
-- **Compare-LKPolicySetting** - Side-by-side comparison of settings between two or more policies to identify configuration drift
-- **Export-LKPolicy** - Export policies and their settings to JSON/CSV for documentation, auditing, or migration
-- **Test-LKPolicyConflict** - Detect policies with overlapping settings assigned to the same groups, surfacing potential configuration conflicts
+All planned features for v0.3.0 have been implemented.
 
 ## Documentation
 
