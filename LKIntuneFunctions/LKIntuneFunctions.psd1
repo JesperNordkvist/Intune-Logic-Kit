@@ -3,7 +3,6 @@
     ModuleVersion     = '0.1.0'
     GUID              = 'a3f7b2c1-9d4e-4a8f-b6e5-1c3d7f9a2b4e'
     Author            = 'Jesper Nordkvist'
-    CompanyName       = 'Lowkey'
     Description       = 'Intune Logic Kit - PowerShell module for Intune management via Microsoft Graph.'
     PowerShellVersion = '5.1'
 
