@@ -37,6 +37,9 @@ function Test-LKPolicyAssignment {
         [ValidateSet('Contains', 'Exact', 'Wildcard', 'Regex')]
         [string]$NameMatch = 'Contains',
 
+        [ValidateSet('Mismatch', 'Warning', 'Info')]
+        [string[]]$Severity,
+
         [switch]$Detailed,
 
         [ValidateSet('List', 'Table')]
@@ -237,6 +240,10 @@ function Test-LKPolicyAssignment {
     }
 
     Write-Progress -Activity 'Auditing policy assignments' -Completed
+
+    if ($Severity) {
+        $issues = [System.Collections.Generic.List[object]]@($issues | Where-Object { $_.Severity -in $Severity })
+    }
 
     if ($Detailed) {
         $separator = [string]([char]0x2500) * 70
