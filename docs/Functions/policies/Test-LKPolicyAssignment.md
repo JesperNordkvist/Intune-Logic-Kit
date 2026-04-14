@@ -79,13 +79,18 @@ Controls output format. Default shows full object properties (List). Table shows
 | PolicyType | String | Human-readable type label |
 | PolicyTypeId | String | Normalised type key |
 | PolicyScope | String | Resolved scope (Device or User) |
-| AssignmentType | String | Include or Exclude |
+| AssignmentType | String | Include, Exclude, AllDevices, AllUsers, or AllLicensedUsers |
 | GroupName | String | Mismatched group name |
 | GroupScope | String | Group's effective scope |
 | DeviceCount | Int | Device members in the group |
 | UserCount | Int | User members in the group |
+| FilterId | String | Intune assignment filter ID, if one is attached |
+| FilterName | String | `"FilterName (Include\|Exclude)"` when a filter is attached, otherwise `$null` |
+| FilterType | String | Raw filter mode from Graph (`include` / `exclude`) |
 | Severity | String | Mismatch, Warning, or Info |
 | Detail | String | Human-readable explanation |
+
+When `-DisplayAs Table` is used, the table includes `AssignmentType` and (conditionally) `FilterName` so you can see at a glance whether a flagged assignment is an inclusion, an exclusion, or scoped by an assignment filter — matching the columns shown by `Get-LKPolicyAssignment`.
 
 ## Examples
 
@@ -107,7 +112,15 @@ Test-LKPolicyAssignment -PolicyType SettingsCatalog, CompliancePolicy
 Test-LKPolicyAssignment | Where-Object Severity -eq 'Mismatch' | Format-Table PolicyName, PolicyScope, GroupName, GroupScope
 ```
 
-### Example 4 - Remediate mismatches
+### Example 4 - Compact table view with filter columns
+
+```powershell
+Test-LKPolicyAssignment -Severity Mismatch -DisplayAs Table
+```
+
+Renders the findings as a colour-coded table including `AssignmentType` and `FilterName` (the latter only appears when at least one issue has a filter attached). Useful when triaging large audits — exclusions and filtered assignments are visible without expanding objects.
+
+### Example 5 - Remediate mismatches
 
 ```powershell
 $mismatches = Test-LKPolicyAssignment | Where-Object Severity -eq 'Mismatch'

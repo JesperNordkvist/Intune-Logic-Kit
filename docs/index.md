@@ -63,13 +63,13 @@ Get-LKGroupAssignment -Name 'Pilot Devices' -NameMatch Exact
 
 ## Features
 
-- **32 commands** covering policies, assignments, groups, devices, and users
+- **33 commands** covering policies, assignments, groups, devices, users, and reports
 - **16 policy types** supported including Settings Catalog, Endpoint Security, Compliance, Apps, Autopilot, and more
 - **Pipeline-friendly** - all functions accept and emit objects for chaining
 - **Scope-aware** - automatic detection of user/device scope mismatches
 - **Policy comparison** - side-by-side setting diffs and conflict detection
 - **Device comparison** - detect drift in OS, apps, and configuration across devices
-- **Export** - export policies and settings to JSON or CSV
+- **Export** - export policies and settings to JSON or CSV, or download Intune reports (devices, compliance, proactive remediations, platform scripts) straight to CSV — the same reports as the portal's Export button
 - **Tab completion** - auto-complete policy and group names after connecting
 - **Safe by default** - all write operations support `-WhatIf` and `-Confirm`
 - **App intent support** - Required, Available, and Uninstall for app assignments

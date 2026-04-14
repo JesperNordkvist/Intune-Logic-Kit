@@ -125,6 +125,19 @@ function Test-LKPolicyAssignment {
                 # Classify assignment type
                 $assignmentType = if ($targetType -like '*exclusion*') { 'Exclude' } else { 'Include' }
 
+                # Capture assignment filter info if present (works for both group and broad targets)
+                $filterId   = $target.deviceAndAppManagementAssignmentFilterId
+                $filterType = $target.deviceAndAppManagementAssignmentFilterType
+                $filterName = $null
+                if ($filterId) {
+                    $resolvedFilter = Resolve-LKFilterName -FilterIds @($filterId)
+                    $fn = $resolvedFilter[$filterId]
+                    $fm = if ($filterType -eq 'include') { 'Include' }
+                          elseif ($filterType -eq 'exclude') { 'Exclude' }
+                          else { $filterType }
+                    $filterName = if ($fn) { "$fn ($fm)" } else { $fm }
+                }
+
                 # Handle broad assignment targets
                 # Skip broad target mismatch checks for EnrollmentConfiguration — default
                 # policies (Limits, Hello, ESP) are assigned to "All users and all devices"
@@ -143,6 +156,9 @@ function Test-LKPolicyAssignment {
                             GroupScope   = 'Device'
                             DeviceCount  = $null
                             UserCount    = $null
+                            FilterId     = $filterId
+                            FilterName   = $filterName
+                            FilterType   = $filterType
                             Severity     = 'Mismatch'
                             Detail       = "User-scoped policy is assigned to All Devices"
                         })
@@ -165,6 +181,9 @@ function Test-LKPolicyAssignment {
                             GroupScope   = 'User'
                             DeviceCount  = $null
                             UserCount    = $null
+                            FilterId     = $filterId
+                            FilterName   = $filterName
+                            FilterType   = $filterType
                             Severity     = 'Mismatch'
                             Detail       = "Device-scoped policy is assigned to $broadLabel"
                         })
@@ -231,6 +250,9 @@ function Test-LKPolicyAssignment {
                         GroupScope   = $gScope.Scope
                         DeviceCount  = $gScope.DeviceCount
                         UserCount    = $gScope.UserCount
+                        FilterId     = $filterId
+                        FilterName   = $filterName
+                        FilterType   = $filterType
                         Severity     = $issueSeverity
                         Detail       = $detail
                     })
@@ -348,12 +370,21 @@ function Test-LKPolicyAssignment {
 
     # Always emit objects to the pipeline (even in -Detailed mode, for capture)
     if ($DisplayAs -eq 'Table') {
+        if ($issues.Count -eq 0) { return }
+
         $colorRules = @{
             PolicyName = { param($val, $row) 'White' }
             PolicyScope = @{
                 'Device' = 'Cyan'
                 'User'   = 'DarkYellow'
                 'Both'   = 'White'
+            }
+            AssignmentType = @{
+                'Include'          = 'Green'
+                'Exclude'          = 'Magenta'
+                'AllDevices'       = 'Cyan'
+                'AllUsers'         = 'DarkYellow'
+                'AllLicensedUsers' = 'DarkYellow'
             }
             GroupName  = { param($val, $row) 'White' }
             GroupScope = @{
@@ -362,13 +393,19 @@ function Test-LKPolicyAssignment {
                 'Both'    = 'Yellow'
                 'Unknown' = 'DarkGray'
             }
+            FilterName = { param($val, $row) if ($val) { 'Magenta' } else { 'DarkGray' } }
             Severity   = @{
                 'Mismatch' = 'Red'
                 'Warning'  = 'Yellow'
                 'Info'     = 'DarkGray'
             }
         }
-        Write-LKTable -Data $issues -Columns PolicyName, PolicyScope, GroupName, GroupScope, Severity -ColorRules $colorRules
+
+        $columns = @('PolicyName', 'PolicyScope', 'AssignmentType', 'GroupName', 'GroupScope')
+        if ($issues | Where-Object { $_.FilterName }) { $columns += 'FilterName' }
+        $columns += 'Severity'
+
+        Write-LKTable -Data $issues -Columns $columns -ColorRules $colorRules
     } else {
         $issues
     }

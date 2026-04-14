@@ -14,6 +14,7 @@ PowerShell module for Microsoft Intune administration via the Microsoft Graph AP
 - **Device Comparison** - Compare devices to detect drift in OS versions, installed apps, and configurations
 - **Conflict Detection** - Detect policies with overlapping settings assigned to the same groups
 - **Export** - Export policies and settings to JSON or CSV for documentation, auditing, or migration
+- **Report Export** - Download Intune reports (devices, compliance, proactive remediations, platform scripts, app install status, malware, firewall) straight to CSV — equivalent to the portal's Export button
 - **Tab Completion** - Auto-complete policy and group names across all commands after initial connection
 - **Scope Resolution** - Automatically resolves policy scope (User/Device) via Graph metadata for accurate mismatch detection
 
@@ -84,7 +85,7 @@ The following delegated scopes are requested during `New-LKSession`:
 
 ## Planned Features
 
-All planned features for v0.3.0 have been implemented.
+All planned features for v0.4.0 have been implemented.
 
 ## Documentation
 
