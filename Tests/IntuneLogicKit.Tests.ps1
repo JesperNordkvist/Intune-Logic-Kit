@@ -424,6 +424,89 @@ Describe 'Add/Remove-LKPolicyAssignment: broad targets (issue #1)' {
     }
 }
 
+Describe 'Get-LKGroupAssignment -Effective: per-scope assessment (issue #4)' {
+    # Regression coverage for issue #4. -Effective collapses the per-group rows
+    # into one row per policy and applies per-scope Exclude-wins: a user-group
+    # Exclude cancels only the user delivery path, a device-group Exclude only
+    # the device path. The switch and its logic landed in v0.5.0.
+
+    BeforeEach {
+        Mock Assert-LKSession -ModuleName IntuneLogicKit { }
+        Mock Write-Host       -ModuleName IntuneLogicKit { }
+        Mock Get-LKGroup      -ModuleName IntuneLogicKit {
+            @(
+                [pscustomobject]@{ Id = 'u1'; Name = 'SG-Intune-U-Pilot Users' }
+                [pscustomobject]@{ Id = 'd1'; Name = 'SG-Intune-D-Pilot Devices' }
+            )
+        }
+        Mock Resolve-LKGroupScope -ModuleName IntuneLogicKit {
+            switch ($GroupId) { 'u1' { 'User' } 'd1' { 'Device' } default { 'Unknown' } }
+        }
+        Mock Invoke-LKGraphRequest -ModuleName IntuneLogicKit {
+            @( @{ id = 'p1'; displayName = 'Compliance - Baseline' } )
+        }
+    }
+
+    It 'A device-group Exclude does not cancel user-group delivery' {
+        Mock Get-LKRawAssignment -ModuleName IntuneLogicKit {
+            @(
+                @{ target = @{ '@odata.type' = '#microsoft.graph.groupAssignmentTarget';          groupId = 'u1' } }
+                @{ target = @{ '@odata.type' = '#microsoft.graph.exclusionGroupAssignmentTarget'; groupId = 'd1' } }
+            )
+        }
+
+        $result = Get-LKGroupAssignment -Name 'SG-Intune-U-Pilot Users', 'SG-Intune-D-Pilot Devices' `
+            -NameMatch Exact -PolicyType CompliancePolicy -SkipScopeResolution -Effective
+
+        $result.EffectiveState | Should -Be 'Applied'
+        $result.UserPath       | Should -Be 'Include:SG-Intune-U-Pilot Users'
+        $result.DevicePath     | Should -Be 'Excluded:SG-Intune-D-Pilot Devices'
+    }
+
+    It 'A user-group Exclude with no Include yields Excluded' {
+        Mock Get-LKRawAssignment -ModuleName IntuneLogicKit {
+            @(
+                @{ target = @{ '@odata.type' = '#microsoft.graph.exclusionGroupAssignmentTarget'; groupId = 'u1' } }
+            )
+        }
+
+        $result = Get-LKGroupAssignment -Name 'SG-Intune-U-Pilot Users', 'SG-Intune-D-Pilot Devices' `
+            -NameMatch Exact -PolicyType CompliancePolicy -SkipScopeResolution -Effective
+
+        $result.EffectiveState | Should -Be 'Excluded'
+        $result.UserPath       | Should -Be 'Excluded:SG-Intune-U-Pilot Users'
+        $result.DevicePath     | Should -Be '-'
+    }
+
+    It 'An All Devices broad target delivers on the device-scope path only' {
+        Mock Get-LKRawAssignment -ModuleName IntuneLogicKit {
+            @(
+                @{ target = @{ '@odata.type' = '#microsoft.graph.allDevicesAssignmentTarget' } }
+            )
+        }
+
+        $result = Get-LKGroupAssignment -Name 'SG-Intune-U-Pilot Users', 'SG-Intune-D-Pilot Devices' `
+            -NameMatch Exact -PolicyType CompliancePolicy -SkipScopeResolution -Effective
+
+        $result.EffectiveState | Should -Be 'Applied'
+        $result.UserPath       | Should -Be '-'
+        $result.DevicePath     | Should -Be 'AllDevices'
+    }
+
+    It '-AppliedOnly drops policies that are not delivered' {
+        Mock Get-LKRawAssignment -ModuleName IntuneLogicKit {
+            @(
+                @{ target = @{ '@odata.type' = '#microsoft.graph.exclusionGroupAssignmentTarget'; groupId = 'u1' } }
+            )
+        }
+
+        $result = Get-LKGroupAssignment -Name 'SG-Intune-U-Pilot Users', 'SG-Intune-D-Pilot Devices' `
+            -NameMatch Exact -PolicyType CompliancePolicy -SkipScopeResolution -Effective -AppliedOnly
+
+        $result | Should -BeNullOrEmpty
+    }
+}
+
 AfterAll {
     Remove-Module -Name IntuneLogicKit -ErrorAction SilentlyContinue
 }
