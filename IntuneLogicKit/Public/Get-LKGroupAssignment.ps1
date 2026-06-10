@@ -4,7 +4,9 @@ function Get-LKGroupAssignment {
         Finds all Intune policies where a specific group is assigned (included or excluded).
     .DESCRIPTION
         Reverse lookup - iterates across all policy types and checks each policy's
-        assignments for the specified group(s). Slow but comprehensive.
+        assignments for the specified group(s). Comprehensive; app assignments are
+        fetched in a single bulk call ($expand=assignments) so app-heavy tenants
+        scan far faster. Combine with -PolicyType App -Platform to narrow further.
 
         When using -Name with the default NameMatch (Contains), multiple groups may match.
         All matching groups are scanned. Use -NameMatch Exact to restrict to a single group.
@@ -172,8 +174,14 @@ function Get-LKGroupAssignment {
         $currentType++
         Write-Progress -Activity "Scanning assignments for $groupLabel" -Status "$($type.DisplayName) ($currentType of $totalTypes)" -PercentComplete (($currentType / $totalTypes) * 100)
 
+        # Apps support bulk $expand=assignments — one paged call returns every app
+        # with its assignments inline, avoiding a per-app assignment round-trip.
+        # On app-heavy tenants that per-app fetch is the dominant cost (issue #15).
+        $useExpand = $type.TypeName -eq 'App'
+        $policyUri = if ($useExpand) { "$($type.Endpoint)?`$expand=assignments" } else { $type.Endpoint }
+
         try {
-            $policies = Invoke-LKGraphRequest -Method GET -Uri $type.Endpoint -ApiVersion $type.ApiVersion -All
+            $policies = Invoke-LKGraphRequest -Method GET -Uri $policyUri -ApiVersion $type.ApiVersion -All
         } catch {
             Write-Warning "Failed to query $($type.DisplayName): $($_.Exception.Message)"
             continue
@@ -184,8 +192,8 @@ function Get-LKGroupAssignment {
         foreach ($policy in $policies) {
             $policyName = $policy.($type.NameProperty)
 
-            # Platform filter (App only) — applied before the per-app assignment
-            # fetch so non-matching apps don't cost a Graph round-trip.
+            # Platform filter (App only) — applied early so non-matching apps skip
+            # all downstream scope/filter resolution.
             if ($Platform -and $type.TypeName -eq 'App') {
                 $appPlatform = if ($policy.'@odata.type') { Resolve-LKAppPlatform -ODataType $policy.'@odata.type' } else { $null }
                 if ($appPlatform -notin $Platform) { continue }
@@ -197,10 +205,15 @@ function Get-LKGroupAssignment {
                 $type.DisplayName
             }
 
-            try {
-                $assignments = Get-LKRawAssignment -PolicyId $policy.id -PolicyType $type
-            } catch {
-                continue
+            if ($useExpand) {
+                # Assignments already came inline via $expand — no extra call.
+                $assignments = @($policy.assignments)
+            } else {
+                try {
+                    $assignments = Get-LKRawAssignment -PolicyId $policy.id -PolicyType $type
+                } catch {
+                    continue
+                }
             }
 
             if (-not $assignments -or $assignments.Count -eq 0) { continue }

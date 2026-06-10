@@ -507,6 +507,74 @@ Describe 'Get-LKGroupAssignment -Effective: per-scope assessment (issue #4)' {
     }
 }
 
+Describe 'Get-LKGroupAssignment: bulk app assignment fetch (issue #15)' {
+    # Apps are fetched with $expand=assignments in one paged call. Assignments
+    # arrive inline, so Get-LKRawAssignment must NOT be invoked per app.
+
+    BeforeEach {
+        Mock Assert-LKSession -ModuleName IntuneLogicKit { }
+        Mock Write-Host       -ModuleName IntuneLogicKit { }
+        Mock Get-LKGroup      -ModuleName IntuneLogicKit {
+            @( [pscustomobject]@{ Id = 'd1'; Name = 'SG-Intune-D-Pilot Devices' } )
+        }
+        # Single-name Exact routes through Resolve-LKGroupId — mock it so the
+        # Invoke-LKGraphRequest mock below is used only for the policy fetch.
+        Mock Resolve-LKGroupId    -ModuleName IntuneLogicKit { 'd1' }
+        Mock Resolve-LKGroupScope -ModuleName IntuneLogicKit { 'Device' }
+        # Apps with assignments inlined via $expand
+        Mock Invoke-LKGraphRequest -ModuleName IntuneLogicKit {
+            @(
+                @{
+                    id            = 'app1'
+                    displayName   = 'Contoso Android App'
+                    '@odata.type' = '#microsoft.graph.androidStoreApp'
+                    assignments   = @(
+                        @{ intent = 'required'; target = @{ '@odata.type' = '#microsoft.graph.groupAssignmentTarget'; groupId = 'd1' } }
+                    )
+                }
+                @{
+                    id            = 'app2'
+                    displayName   = 'Contoso iOS App'
+                    '@odata.type' = '#microsoft.graph.iosStoreApp'
+                    assignments   = @(
+                        @{ intent = 'available'; target = @{ '@odata.type' = '#microsoft.graph.groupAssignmentTarget'; groupId = 'other' } }
+                    )
+                }
+            )
+        }
+        Mock Get-LKRawAssignment -ModuleName IntuneLogicKit { @() }
+    }
+
+    It 'Reads inline assignments and finds the group without per-app calls' {
+        $result = @(Get-LKGroupAssignment -Name 'SG-Intune-D-Pilot Devices' `
+                -NameMatch Exact -PolicyType App -SkipScopeResolution)
+
+        $result.Count            | Should -Be 1
+        $result[0].PolicyName    | Should -Be 'Contoso Android App'
+        $result[0].AssignmentType | Should -Be 'Include'
+        $result[0].Intent        | Should -Be 'required'
+
+        Should -Invoke Get-LKRawAssignment -ModuleName IntuneLogicKit -Times 0 -Exactly
+    }
+
+    It 'Requests the apps endpoint with $expand=assignments' {
+        Get-LKGroupAssignment -Name 'SG-Intune-D-Pilot Devices' `
+            -NameMatch Exact -PolicyType App -SkipScopeResolution | Out-Null
+
+        Should -Invoke Invoke-LKGraphRequest -ModuleName IntuneLogicKit -Times 1 -Exactly -ParameterFilter {
+            $Uri -like '*mobileApps?$expand=assignments*'
+        }
+    }
+
+    It 'Honors -Platform alongside the bulk fetch' {
+        $result = @(Get-LKGroupAssignment -Name 'SG-Intune-D-Pilot Devices' `
+                -NameMatch Exact -PolicyType App -Platform iOS -SkipScopeResolution)
+
+        # Only the iOS app is considered; it targets 'other', not our group -> no rows
+        $result.Count | Should -Be 0
+    }
+}
+
 Describe 'Resolve-LKAppPlatform: @odata.type -> platform (issue #14)' {
     BeforeAll {
         $module = Get-Module IntuneLogicKit
