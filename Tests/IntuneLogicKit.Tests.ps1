@@ -53,6 +53,20 @@ Describe 'Module: IntuneLogicKit' {
     }
 }
 
+Describe 'Module requirements (issue #12)' {
+    BeforeAll {
+        $manifest = Import-PowerShellDataFile "$PSScriptRoot\..\IntuneLogicKit\IntuneLogicKit.psd1"
+    }
+
+    It 'Requires PowerShell 7.0 or later' {
+        $manifest.PowerShellVersion | Should -Be '7.0'
+    }
+
+    It 'Targets the PowerShell Core edition' {
+        $manifest.CompatiblePSEditions | Should -Contain 'Core'
+    }
+}
+
 Describe 'Session state' {
     It 'Should initialize with Connected = false' {
         Get-LKSession 3>&1 | Should -BeLike '*No active session*'

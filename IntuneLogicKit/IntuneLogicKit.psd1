@@ -4,7 +4,10 @@
     GUID              = 'a3f7b2c1-9d4e-4a8f-b6e5-1c3d7f9a2b4e'
     Author            = 'Jesper Nordkvist'
     Description       = 'Intune Logic Kit - PowerShell module for Intune management via Microsoft Graph.'
-    PowerShellVersion = '5.1'
+    # PowerShell 7+ is required. Passkey/FIDO2 sign-in via Connect-MgGraph does not
+    # work on Windows PowerShell 5.1, and 5.1 is frozen (maintenance-only).
+    PowerShellVersion    = '7.0'
+    CompatiblePSEditions = @('Core')
 
     FunctionsToExport = @(
         'New-LKSession'
