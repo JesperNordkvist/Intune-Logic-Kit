@@ -12,6 +12,7 @@ Audits Intune policies for scope mismatches - device policies assigned to user g
 ```text
 Test-LKPolicyAssignment
     [-PolicyType <String[]>]
+    [-Platform <String[]>]
     [-Name <String[]>]
     [-NameMatch <String>]
     [-Detailed]
@@ -36,6 +37,16 @@ Group scope results are cached to avoid redundant API calls across policies that
 | Type | `String[]` |
 | Required | No |
 | Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App, AutopilotDeploymentProfile |
+
+### -Platform
+
+Restrict App results to one or more platforms. Applies only to the `App` policy type (derived from each app's `@odata.type`); ignored with a warning if `App` is not in scope.
+
+| Attribute | Value |
+|---|---|
+| Type | `String[]` |
+| Required | No |
+| Valid values | Android, iOS, macOS, Windows, Web |
 
 ### -Name
 

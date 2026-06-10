@@ -17,6 +17,9 @@ function Get-LKPolicy {
     .EXAMPLE
         Get-LKPolicy -Name "Baseline" -DisplayAs Table
         Shows results as a compact table.
+    .EXAMPLE
+        Get-LKPolicy -PolicyType App -Platform Android
+        Returns only Android applications. -Platform applies to the App type only.
     #>
     [CmdletBinding()]
     param(
@@ -33,6 +36,9 @@ function Get-LKPolicy {
             'DriverUpdate', 'App', 'AutopilotDeploymentProfile'
         )]
         [string[]]$PolicyType,
+
+        [ValidateSet('Android', 'iOS', 'macOS', 'Windows', 'Web')]
+        [string[]]$Platform,
 
         [switch]$ResolveScope,
 
@@ -52,6 +58,10 @@ function Get-LKPolicy {
         $script:LKPolicyTypes | Where-Object { $_.TypeName -in $PolicyType }
     } else {
         $script:LKPolicyTypes
+    }
+
+    if ($Platform -and -not ($types | Where-Object { $_.TypeName -eq 'App' })) {
+        Write-Warning "-Platform only applies to the App policy type, which is not in scope; ignoring -Platform."
     }
 
     $totalTypes = $types.Count
@@ -77,6 +87,11 @@ function Get-LKPolicy {
 
             if ($Name -and -not (Test-LKNameMatch -Value $policyName -Name $Name -NameMatch $NameMatch)) {
                 continue
+            }
+
+            if ($Platform -and $type.TypeName -eq 'App') {
+                $appPlatform = if ($raw.'@odata.type') { Resolve-LKAppPlatform -ODataType $raw.'@odata.type' } else { $null }
+                if ($appPlatform -notin $Platform) { continue }
             }
 
             $resolvedScope = $null

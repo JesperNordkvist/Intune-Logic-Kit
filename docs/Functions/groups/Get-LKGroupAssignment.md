@@ -15,6 +15,7 @@ Get-LKGroupAssignment
     -Name <String[]>
     [-NameMatch <String>]
     [-PolicyType <String[]>]
+    [-Platform <String[]>]
     [-SkipScopeResolution]
     [-AssignmentType <String>]
     [-DisplayAs <String>]
@@ -26,6 +27,7 @@ Get-LKGroupAssignment
 Get-LKGroupAssignment
     -GroupId <String>
     [-PolicyType <String[]>]
+    [-Platform <String[]>]
     [-SkipScopeResolution]
     [-AssignmentType <String>]
     [-DisplayAs <String>]
@@ -73,6 +75,16 @@ Restrict to specific policy types.
 | Type | `String[]` |
 | Required | No |
 | Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
+
+### -Platform
+
+Restrict App results to one or more platforms. Applies only to the `App` policy type (derived from each app's `@odata.type`); ignored with a warning if `App` is not in scope. Because non-matching apps are skipped before their assignments are fetched, this also speeds up the scan considerably on app-heavy tenants.
+
+| Attribute | Value |
+|---|---|
+| Type | `String[]` |
+| Required | No |
+| Valid values | Android, iOS, macOS, Windows, Web |
 
 ### -SkipScopeResolution
 
@@ -187,6 +199,12 @@ Get-LKGroupAssignment -Name 'Pilot' -PolicyType CompliancePolicy, SettingsCatalo
 
 ```powershell
 Get-LKGroupAssignment -Name 'All Users' -PolicyType App | Format-Table PolicyName, Intent
+```
+
+### Example 5b - Scan only Android apps (faster on app-heavy tenants)
+
+```powershell
+Get-LKGroupAssignment -Name 'Pilot Devices' -NameMatch Exact -PolicyType App -Platform Android
 ```
 
 ### Example 6 - Joint effective assessment across user + device groups
