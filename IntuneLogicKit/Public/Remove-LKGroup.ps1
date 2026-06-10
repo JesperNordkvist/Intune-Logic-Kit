@@ -16,7 +16,7 @@ function Remove-LKGroup {
         [string]$GroupId
     )
 
-    Assert-LKSession
+    Assert-LKSession -RequireWrite
 
     $id = if ($PSCmdlet.ParameterSetName -eq 'ByName') {
         Resolve-LKGroupId -GroupName $Name

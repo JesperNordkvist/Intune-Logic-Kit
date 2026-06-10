@@ -66,7 +66,7 @@ function Add-LKPolicyAssignment {
     )
 
     begin {
-        Assert-LKSession
+        Assert-LKSession -RequireWrite
 
         if ($FilterName -and -not $FilterMode) { throw "-FilterMode is required when -FilterName is specified." }
         if ($FilterMode -and -not $FilterName) { throw "-FilterName is required when -FilterMode is specified." }

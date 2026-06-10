@@ -47,7 +47,7 @@ function Remove-LKPolicyExclusion {
     )
 
     begin {
-        Assert-LKSession
+        Assert-LKSession -RequireWrite
         $groupId = Resolve-LKGroupId -GroupName $GroupName
         $bulkConfirmed = $false
 
