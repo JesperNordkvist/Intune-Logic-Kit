@@ -72,13 +72,15 @@ Get-LKGroupAssignment -Name 'Pilot Devices' -NameMatch Exact
 - **Export** - export policies and settings to JSON or CSV, or download Intune reports (devices, compliance, proactive remediations, platform scripts) straight to CSV - the same reports as the portal's Export button
 - **Tab completion** - auto-complete policy and group names after connecting
 - **Safe by default** - all write operations support `-WhatIf` and `-Confirm`
+- **Read-only mode** - `New-LKSession -ReadOnly` audits without consenting to any write scope
+- **Platform filtering** - narrow App queries to Android, iOS, macOS, Windows, or Web
 - **App intent support** - Required, Available, and Uninstall for app assignments
 
 ## Requirements
 
 | Requirement | Minimum |
 |---|---|
-| PowerShell | 5.1+ |
+| PowerShell | 7.0+ (Windows PowerShell 5.1 is not supported) |
 | Microsoft Graph PowerShell SDK | `Microsoft.Graph.Authentication` module |
 | Permissions | Intune Administrator role (or equivalent Graph scopes) |
 
