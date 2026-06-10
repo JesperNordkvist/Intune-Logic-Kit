@@ -66,8 +66,8 @@ Get-LKPolicy -Name "Microsoft Edge" | Show-LKPolicyDetail
 
 ## Requirements
 
-- PowerShell 5.1 or later
-- [Microsoft.Graph.Authentication](https://www.powershellgallery.com/packages/Microsoft.Graph.Authentication) module
+- **PowerShell 7+** (PowerShell 7.4 LTS or later recommended). Windows PowerShell 5.1 is **not supported**: passkey/FIDO2 sign-in via `Connect-MgGraph` does not work there, and 5.1 is frozen (maintenance-only). Install from [aka.ms/powershell](https://aka.ms/powershell).
+- [Microsoft.Graph.Authentication](https://www.powershellgallery.com/packages/Microsoft.Graph.Authentication) module (auto-installed by `New-LKSession`)
 - An Intune-licensed tenant with appropriate admin permissions
 
 ## Required Graph Permissions
