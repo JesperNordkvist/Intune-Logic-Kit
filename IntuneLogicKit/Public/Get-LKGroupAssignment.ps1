@@ -41,6 +41,10 @@ function Get-LKGroupAssignment {
         Get-LKGroupAssignment -Name 'Pilot Devices' -AssignmentType All
         Shows both include and exclude assignments for the group.
     .EXAMPLE
+        Get-LKGroupAssignment -Name 'Pilot Devices' -NameMatch Exact -PolicyType App -Platform Android
+        Scans only Android apps for the group — much faster on app-heavy tenants,
+        since non-Android apps are skipped before their assignments are fetched.
+    .EXAMPLE
         Get-LKGroupAssignment -Name 'Pilot Devices' -DisplayAs Table
         Shows results as a compact table.
     .EXAMPLE
@@ -70,6 +74,9 @@ function Get-LKGroupAssignment {
             'DriverUpdate', 'App', 'AutopilotDeploymentProfile'
         )]
         [string[]]$PolicyType,
+
+        [ValidateSet('Android', 'iOS', 'macOS', 'Windows', 'Web')]
+        [string[]]$Platform,
 
         [switch]$SkipScopeResolution,
 
@@ -153,6 +160,10 @@ function Get-LKGroupAssignment {
         $script:LKPolicyTypes
     }
 
+    if ($Platform -and -not ($types | Where-Object { $_.TypeName -eq 'App' })) {
+        Write-Warning "-Platform only applies to the App policy type, which is not in scope; ignoring -Platform."
+    }
+
     $totalTypes = $types.Count
     $currentType = 0
     $groupLabel = if ($targetGroups.Count -eq 1) { $targetGroups[0].Name } else { "$($targetGroups.Count) groups" }
@@ -172,6 +183,14 @@ function Get-LKGroupAssignment {
 
         foreach ($policy in $policies) {
             $policyName = $policy.($type.NameProperty)
+
+            # Platform filter (App only) — applied before the per-app assignment
+            # fetch so non-matching apps don't cost a Graph round-trip.
+            if ($Platform -and $type.TypeName -eq 'App') {
+                $appPlatform = if ($policy.'@odata.type') { Resolve-LKAppPlatform -ODataType $policy.'@odata.type' } else { $null }
+                if ($appPlatform -notin $Platform) { continue }
+            }
+
             $displayType = if ($type.TypeName -eq 'App' -and $policy.'@odata.type') {
                 Resolve-LKAppDisplayType -ODataType $policy.'@odata.type'
             } else {

@@ -20,6 +20,9 @@ function Test-LKPolicyAssignment {
     .EXAMPLE
         Test-LKPolicyAssignment -Name "XW365" | Format-Table
         Filters to policies matching "XW365" and displays as a table.
+    .EXAMPLE
+        Test-LKPolicyAssignment -PolicyType App -Platform iOS
+        Audits only iOS apps for scope mismatches. -Platform applies to the App type only.
     #>
     [CmdletBinding()]
     param(
@@ -31,6 +34,9 @@ function Test-LKPolicyAssignment {
             'DriverUpdate', 'App', 'AutopilotDeploymentProfile'
         )]
         [string[]]$PolicyType,
+
+        [ValidateSet('Android', 'iOS', 'macOS', 'Windows', 'Web')]
+        [string[]]$Platform,
 
         [string[]]$Name,
 
@@ -52,6 +58,10 @@ function Test-LKPolicyAssignment {
         $script:LKPolicyTypes | Where-Object { $_.TypeName -in $PolicyType }
     } else {
         $script:LKPolicyTypes
+    }
+
+    if ($Platform -and -not ($types | Where-Object { $_.TypeName -eq 'App' })) {
+        Write-Warning "-Platform only applies to the App policy type, which is not in scope; ignoring -Platform."
     }
 
     # Caches to avoid repeated Graph calls
@@ -83,6 +93,12 @@ function Test-LKPolicyAssignment {
             $nameProp = $type.NameProperty
             $policyName = $raw.$nameProp
             if (-not $policyName) { continue }
+
+            # Platform filter (App only) — skip before resolving scope / fetching assignments
+            if ($Platform -and $type.TypeName -eq 'App') {
+                $appPlatform = if ($raw.'@odata.type') { Resolve-LKAppPlatform -ODataType $raw.'@odata.type' } else { $null }
+                if ($appPlatform -notin $Platform) { continue }
+            }
 
             $displayType = if ($type.TypeName -eq 'App' -and $raw.'@odata.type') {
                 Resolve-LKAppDisplayType -ODataType $raw.'@odata.type'

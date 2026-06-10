@@ -14,6 +14,7 @@ Get-LKPolicy
     [-Name <String[]>]
     [-NameMatch <String>]
     [-PolicyType <String[]>]
+    [-Platform <String[]>]
     [-ResolveScope]
     [-IncludeSettings]
     [-FilterScript <ScriptBlock>]
@@ -55,6 +56,16 @@ Restrict the search to specific policy types. When omitted, all types are search
 | Type | `String[]` |
 | Required | No |
 | Valid values | DeviceConfiguration, SettingsCatalog, CompliancePolicy, EndpointSecurity, AppProtectionIOS, AppProtectionAndroid, AppProtectionWindows, AppConfiguration, EnrollmentConfiguration, PolicySet, GroupPolicyConfiguration, PlatformScript, Remediation, DriverUpdate, App |
+
+### -Platform
+
+Restrict App results to one or more platforms. Applies only to the `App` policy type (derived from each app's `@odata.type`); ignored with a warning if `App` is not in scope. Apps whose platform can't be determined are excluded.
+
+| Attribute | Value |
+|---|---|
+| Type | `String[]` |
+| Required | No |
+| Valid values | Android, iOS, macOS, Windows, Web |
 
 ### -ResolveScope
 
@@ -129,6 +140,12 @@ Get-LKPolicy -Name "Baseline*" -NameMatch Wildcard -FilterScript { $_.TargetScop
 
 ```powershell
 Get-LKPolicy -Name "Firewall" -IncludeSettings | Select-Object Name, Settings
+```
+
+### Example 5 - Filter apps by platform
+
+```powershell
+Get-LKPolicy -PolicyType App -Platform Android
 ```
 
 ## Related

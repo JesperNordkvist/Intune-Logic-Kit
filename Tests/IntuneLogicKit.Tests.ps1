@@ -507,6 +507,48 @@ Describe 'Get-LKGroupAssignment -Effective: per-scope assessment (issue #4)' {
     }
 }
 
+Describe 'Resolve-LKAppPlatform: @odata.type -> platform (issue #14)' {
+    BeforeAll {
+        $module = Get-Module IntuneLogicKit
+    }
+
+    It 'Maps <ODataType> to <Expected>' -TestCases @(
+        # Android
+        @{ ODataType = '#microsoft.graph.androidStoreApp';            Expected = 'Android' }
+        @{ ODataType = '#microsoft.graph.androidManagedStoreApp';     Expected = 'Android' }
+        @{ ODataType = '#microsoft.graph.managedAndroidStoreApp';     Expected = 'Android' }
+        @{ ODataType = '#microsoft.graph.androidForWorkApp';          Expected = 'Android' }
+        # iOS
+        @{ ODataType = '#microsoft.graph.iosStoreApp';                Expected = 'iOS' }
+        @{ ODataType = '#microsoft.graph.iosVppApp';                  Expected = 'iOS' }
+        @{ ODataType = '#microsoft.graph.managedIOSStoreApp';         Expected = 'iOS' }
+        # macOS — must win over shared keywords (Office/Edge/VPP)
+        @{ ODataType = '#microsoft.graph.macOSDmgApp';                Expected = 'macOS' }
+        @{ ODataType = '#microsoft.graph.macOSOfficeSuiteApp';        Expected = 'macOS' }
+        @{ ODataType = '#microsoft.graph.macOSMicrosoftEdgeApp';      Expected = 'macOS' }
+        @{ ODataType = '#microsoft.graph.macOSVppApp';                Expected = 'macOS' }
+        # Windows
+        @{ ODataType = '#microsoft.graph.win32LobApp';                Expected = 'Windows' }
+        @{ ODataType = '#microsoft.graph.winGetApp';                  Expected = 'Windows' }
+        @{ ODataType = '#microsoft.graph.officeSuiteApp';             Expected = 'Windows' }
+        @{ ODataType = '#microsoft.graph.microsoftStoreForBusinessApp'; Expected = 'Windows' }
+        @{ ODataType = '#microsoft.graph.windowsMicrosoftEdgeApp';    Expected = 'Windows' }
+        # windowsWebApp must resolve to Windows, not Web
+        @{ ODataType = '#microsoft.graph.windowsWebApp';              Expected = 'Windows' }
+        # Web (generic clip)
+        @{ ODataType = '#microsoft.graph.webApp';                     Expected = 'Web' }
+    ) {
+        param($ODataType, $Expected)
+        $result = & $module { param($t) Resolve-LKAppPlatform -ODataType $t } $ODataType
+        $result | Should -Be $Expected
+    }
+
+    It 'Returns $null for an unrecognized type' {
+        $result = & $module { param($t) Resolve-LKAppPlatform -ODataType $t } '#microsoft.graph.someFutureUnknownApp'
+        $result | Should -BeNullOrEmpty
+    }
+}
+
 AfterAll {
     Remove-Module -Name IntuneLogicKit -ErrorAction SilentlyContinue
 }
