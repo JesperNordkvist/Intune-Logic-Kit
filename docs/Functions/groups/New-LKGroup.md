@@ -24,8 +24,8 @@ New-LKGroup
 
 Creates a security group in Entra ID.
 
-- **`-GroupType Assigned`** (default) — a static group. Add members later with `Add-LKGroupMember`.
-- **`-GroupType Dynamic`** — requires `-MembershipRule`. Entra classifies the group as dynamic user or dynamic device automatically based on whether the rule uses `user.*` or `device.*` properties. No separate "dynamic user" / "dynamic device" switch is needed.
+- **`-GroupType Assigned`** (default) - a static group. Add members later with `Add-LKGroupMember`.
+- **`-GroupType Dynamic`** - requires `-MembershipRule`. Entra classifies the group as dynamic user or dynamic device automatically based on whether the rule uses `user.*` or `device.*` properties. No separate "dynamic user" / "dynamic device" switch is needed.
 
 Dynamic groups require an Entra ID P1 license in the tenant.
 
@@ -40,7 +40,7 @@ Dynamic groups require an Entra ID P1 license in the tenant.
 
 ### -Description
 
-Optional. Omitted from the Graph payload when blank — some tenants reject an empty-string description with a generic 400.
+Optional. Omitted from the Graph payload when blank - some tenants reject an empty-string description with a generic 400.
 
 | Attribute | Value |
 |---|---|
@@ -93,36 +93,36 @@ Standard risk-mitigation switches.
 
 Examples use the `U` (user-scoped) / `D` (device-scoped) naming convention that `Test-LKPolicyAssignment` uses as a scope heuristic.
 
-### Example 1 — Assigned group (default)
+### Example 1 - Assigned group (default)
 
 ```powershell
 New-LKGroup -Name 'SG-Intune-U-Pilot Users' -Description 'Pilot users'
 ```
 
-### Example 2 — Dynamic user group (all licensed, enabled Intune users)
+### Example 2 - Dynamic user group (all licensed, enabled Intune users)
 
 ```powershell
 New-LKGroup -Name 'SG-Intune-U-All Users' -GroupType Dynamic `
     -MembershipRule '(user.accountEnabled -eq true) and (user.assignedPlans -any (assignedPlan.servicePlanId -eq "c1ec4a95-1f05-45b3-a911-aa3fa01094f5" -and assignedPlan.capabilityStatus -eq "Enabled"))'
 ```
 
-The servicePlanId above matches the Intune service plan — adjust for your tenant's licensing.
+The servicePlanId above matches the Intune service plan - adjust for your tenant's licensing.
 
-### Example 3 — Dynamic device group (physical Windows devices)
+### Example 3 - Dynamic device group (physical Windows devices)
 
 ```powershell
 New-LKGroup -Name 'SG-Intune-D-Windows Physical' -GroupType Dynamic `
     -MembershipRule '(device.deviceModel -notContains "Virtual Machine") and (device.managementType -eq "MDM") and (device.deviceOSType -contains "Windows")'
 ```
 
-### Example 4 — Dynamic device group (Autopilot-registered)
+### Example 4 - Dynamic device group (Autopilot-registered)
 
 ```powershell
 New-LKGroup -Name 'SG-Intune-D-Windows Autopilot' -GroupType Dynamic `
     -MembershipRule '(device.devicePhysicalIDs -any _ -contains "[ZTDId]")'
 ```
 
-### Example 5 — Per-manufacturer dynamic device groups
+### Example 5 - Per-manufacturer dynamic device groups
 
 ```powershell
 'HP','Dell','Lenovo' | ForEach-Object {
@@ -133,7 +133,7 @@ New-LKGroup -Name 'SG-Intune-D-Windows Autopilot' -GroupType Dynamic `
 
 Useful for targeting BIOS/driver updates per vendor.
 
-### Example 6 — Rule syntax with `-WhatIf` (dry run)
+### Example 6 - Rule syntax with `-WhatIf` (dry run)
 
 ```powershell
 New-LKGroup -Name 'SG-Test-U-Dynamic' -GroupType Dynamic `
@@ -145,6 +145,6 @@ Shows the full Graph payload that would be sent without creating the group.
 
 ## Related
 
-- [Add-LKGroupMember](Add-LKGroupMember.md) — add users/devices/groups as members
+- [Add-LKGroupMember](Add-LKGroupMember.md) - add users/devices/groups as members
 - [Remove-LKGroup](Remove-LKGroup.md)
 - [Rename-LKGroup](Rename-LKGroup.md)

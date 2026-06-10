@@ -120,7 +120,7 @@ Collapses assignments across all named groups into one row per policy, applying 
 
 Intune's real rule: Excludes only take effect for the scope (user or device) that matches the excluded group. A user-group Exclude cannot cancel a device's `AllDevices` delivery path, and vice versa. `-Effective` computes delivery per scope and combines them.
 
-When `-Effective` is set, the output schema changes — see the Effective Outputs table below. `-AssignmentType` is ignored (forced to `All`).
+When `-Effective` is set, the output schema changes - see the Effective Outputs table below. `-AssignmentType` is ignored (forced to `All`).
 
 | Attribute | Value |
 |---|---|
@@ -218,7 +218,7 @@ Get-LKGroupAssignment `
     Format-Table DisplayType, PolicyName, EffectiveState, UserPath, DevicePath, FilterName -AutoSize
 ```
 
-Answers: for a user in `SG-Intune-U-Pilot Users` whose device is in `SG-Intune-D-Pilot Devices`, which policies effectively apply? Excludes are evaluated per-scope — a user-group Exclude won't cancel the device's `AllDevices` delivery path, and vice versa.
+Answers: for a user in `SG-Intune-U-Pilot Users` whose device is in `SG-Intune-D-Pilot Devices`, which policies effectively apply? Excludes are evaluated per-scope - a user-group Exclude won't cancel the device's `AllDevices` delivery path, and vice versa.
 
 ### Example 7 - Only what actually hits the user + device
 

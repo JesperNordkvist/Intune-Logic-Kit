@@ -1,7 +1,7 @@
 function Test-LKPolicyAssignment {
     <#
     .SYNOPSIS
-        Audits Intune policies for scope mismatches — device policies assigned to user groups (or vice versa).
+        Audits Intune policies for scope mismatches - device policies assigned to user groups (or vice versa).
     .DESCRIPTION
         Iterates all (or filtered) policy types, resolves each policy's effective scope,
         fetches assignments, determines each assigned group's scope via transitive membership,
@@ -94,7 +94,7 @@ function Test-LKPolicyAssignment {
             $policyName = $raw.$nameProp
             if (-not $policyName) { continue }
 
-            # Platform filter (App only) — skip before resolving scope / fetching assignments
+            # Platform filter (App only) - skip before resolving scope / fetching assignments
             if ($Platform -and $type.TypeName -eq 'App') {
                 $appPlatform = if ($raw.'@odata.type') { Resolve-LKAppPlatform -ODataType $raw.'@odata.type' } else { $null }
                 if ($appPlatform -notin $Platform) { continue }
@@ -118,7 +118,7 @@ function Test-LKPolicyAssignment {
                 Resolve-LKPolicyScope -RawPolicy $raw -PolicyType $type
             }
 
-            # Both-scoped policies can't have a mismatch — skip
+            # Both-scoped policies can't have a mismatch - skip
             if ($policyScope -eq 'Both') { continue }
 
             # Fetch assignments
@@ -155,7 +155,7 @@ function Test-LKPolicyAssignment {
                 }
 
                 # Handle broad assignment targets
-                # Skip broad target mismatch checks for EnrollmentConfiguration — default
+                # Skip broad target mismatch checks for EnrollmentConfiguration - default
                 # policies (Limits, Hello, ESP) are assigned to "All users and all devices"
                 # by design and cannot be changed
                 if ($targetType -like '*allDevicesAssignmentTarget*') {

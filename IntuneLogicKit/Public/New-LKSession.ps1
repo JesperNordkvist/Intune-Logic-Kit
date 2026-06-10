@@ -18,7 +18,7 @@ function New-LKSession {
         New-LKSession
     .EXAMPLE
         New-LKSession -ReadOnly
-        Connects for auditing only — no write scopes are requested or usable.
+        Connects for auditing only - no write scopes are requested or usable.
     #>
     [CmdletBinding()]
     param (
@@ -81,7 +81,7 @@ function New-LKSession {
     }
 
     if ($ReadOnly) {
-        Write-Host 'Connected in read-only mode — write commands are disabled for this session.' -ForegroundColor DarkYellow
+        Write-Host 'Connected in read-only mode - write commands are disabled for this session.' -ForegroundColor DarkYellow
     }
 
     # Persist session reference for the tenant/account guardrail
@@ -110,13 +110,13 @@ function New-LKSession {
     Write-Host '  Scanning environment...' -ForegroundColor DarkGray -NoNewline
 
     try {
-        # Groups — single lightweight call
+        # Groups - single lightweight call
         $groups = Invoke-LKGraphRequest -Method GET -Uri '/groups?$select=displayName&$top=999' -ApiVersion 'v1.0' -All
         foreach ($g in $groups) {
             if ($g.displayName) { $script:LKGroupNameCache.Add($g.displayName) | Out-Null }
         }
 
-        # Policies — one call per type
+        # Policies - one call per type
         foreach ($type in $script:LKPolicyTypes) {
             try {
                 $policies = Invoke-LKGraphRequest -Method GET -Uri "$($type.Endpoint)?`$select=$($type.NameProperty)" -ApiVersion $type.ApiVersion -All
@@ -125,13 +125,13 @@ function New-LKSession {
                     if ($name) { $script:LKPolicyNameCache.Add($name) | Out-Null }
                 }
             } catch {
-                # Non-critical — skip types that fail
+                # Non-critical - skip types that fail
             }
         }
 
         Write-Host " $($script:LKPolicyNameCache.Count) policies, $($script:LKGroupNameCache.Count) groups cached." -ForegroundColor DarkGray
     } catch {
-        Write-Host ' (cache preload failed — tab completion will populate on first query)' -ForegroundColor DarkGray
+        Write-Host ' (cache preload failed - tab completion will populate on first query)' -ForegroundColor DarkGray
     }
 
     # Non-blocking check for newer releases

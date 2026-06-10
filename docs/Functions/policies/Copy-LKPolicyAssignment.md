@@ -21,7 +21,7 @@ Copy-LKPolicyAssignment
 
 ## Description
 
-Finds all policies where the source group is assigned, then assigns the target group to those same policies. Skips policies where the target group is already assigned. Only explicit group assignments (Include/Exclude) are copied — broad targets (All Devices, All Users) are tenant-wide and not copied.
+Finds all policies where the source group is assigned, then assigns the target group to those same policies. Skips policies where the target group is already assigned. Only explicit group assignments (Include/Exclude) are copied - broad targets (All Devices, All Users) are tenant-wide and not copied.
 
 App intent (Required, Available, Uninstall) and assignment filters are carried over automatically.
 

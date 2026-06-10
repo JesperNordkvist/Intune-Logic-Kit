@@ -26,8 +26,8 @@ Results are separated into two categories:
 
 | Category | Meaning |
 |---|---|
-| **Conflicting values** | Same setting, same groups, but different values — one will win and the other is silently ignored |
-| **Duplicate settings** | Same setting, same groups, same value — redundant but not harmful |
+| **Conflicting values** | Same setting, same groups, but different values - one will win and the other is silently ignored |
+| **Duplicate settings** | Same setting, same groups, same value - redundant but not harmful |
 
 ## Parameters
 
@@ -117,7 +117,7 @@ Test-LKPolicyConflict -Detailed |
 
 - This function makes many API calls: it fetches settings AND assignments for every policy in scope. Use `-PolicyType` and `-Setting` to narrow the scan for faster results.
 - "All Devices" and "All Users" broad targets are tracked and will match against each other across policies.
-- The conflict detection is pairwise — if three policies share a setting and group, each pair is reported separately.
+- The conflict detection is pairwise - if three policies share a setting and group, each pair is reported separately.
 
 ## Related
 

@@ -105,7 +105,7 @@ Shows property differences between the two devices.
 Compare-LKDevice -DeviceName "AVD-PROD-01", "AVD-GOLD-01" -IncludeApps
 ```
 
-Also compares installed apps and their versions — ideal for detecting AVD image drift.
+Also compares installed apps and their versions - ideal for detecting AVD image drift.
 
 ### Example 3 - Pipeline from Get-LKDevice
 

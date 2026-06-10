@@ -101,7 +101,7 @@ Controls output format. Default shows full object properties (List). Table shows
 | Severity | String | Mismatch, Warning, or Info |
 | Detail | String | Human-readable explanation |
 
-When `-DisplayAs Table` is used, the table includes `AssignmentType` and (conditionally) `FilterName` so you can see at a glance whether a flagged assignment is an inclusion, an exclusion, or scoped by an assignment filter — matching the columns shown by `Get-LKPolicyAssignment`.
+When `-DisplayAs Table` is used, the table includes `AssignmentType` and (conditionally) `FilterName` so you can see at a glance whether a flagged assignment is an inclusion, an exclusion, or scoped by an assignment filter - matching the columns shown by `Get-LKPolicyAssignment`.
 
 ## Examples
 
@@ -129,7 +129,7 @@ Test-LKPolicyAssignment | Where-Object Severity -eq 'Mismatch' | Format-Table Po
 Test-LKPolicyAssignment -Severity Mismatch -DisplayAs Table
 ```
 
-Renders the findings as a colour-coded table including `AssignmentType` and `FilterName` (the latter only appears when at least one issue has a filter attached). Useful when triaging large audits — exclusions and filtered assignments are visible without expanding objects.
+Renders the findings as a colour-coded table including `AssignmentType` and `FilterName` (the latter only appears when at least one issue has a filter attached). Useful when triaging large audits - exclusions and filtered assignments are visible without expanding objects.
 
 ### Example 5 - Remediate mismatches
 

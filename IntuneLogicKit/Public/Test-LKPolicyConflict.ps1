@@ -115,7 +115,7 @@ function Test-LKPolicyConflict {
 
     Write-Progress -Activity 'Scanning for policy conflicts' -Status 'Analyzing...' -PercentComplete 90
 
-    # Phase 2: Find conflicts — settings shared across policies with overlapping assignments
+    # Phase 2: Find conflicts - settings shared across policies with overlapping assignments
     # Index: setting name -> list of policies that configure it
     $settingIndex = @{}
     foreach ($p in $policyInfo) {

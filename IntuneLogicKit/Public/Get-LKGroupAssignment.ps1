@@ -44,7 +44,7 @@ function Get-LKGroupAssignment {
         Shows both include and exclude assignments for the group.
     .EXAMPLE
         Get-LKGroupAssignment -Name 'Pilot Devices' -NameMatch Exact -PolicyType App -Platform Android
-        Scans only Android apps for the group — much faster on app-heavy tenants,
+        Scans only Android apps for the group - much faster on app-heavy tenants,
         since non-Android apps are skipped before their assignments are fetched.
     .EXAMPLE
         Get-LKGroupAssignment -Name 'Pilot Devices' -DisplayAs Table
@@ -174,7 +174,7 @@ function Get-LKGroupAssignment {
         $currentType++
         Write-Progress -Activity "Scanning assignments for $groupLabel" -Status "$($type.DisplayName) ($currentType of $totalTypes)" -PercentComplete (($currentType / $totalTypes) * 100)
 
-        # Apps support bulk $expand=assignments — one paged call returns every app
+        # Apps support bulk $expand=assignments - one paged call returns every app
         # with its assignments inline, avoiding a per-app assignment round-trip.
         # On app-heavy tenants that per-app fetch is the dominant cost (issue #15).
         $useExpand = $type.TypeName -eq 'App'
@@ -192,7 +192,7 @@ function Get-LKGroupAssignment {
         foreach ($policy in $policies) {
             $policyName = $policy.($type.NameProperty)
 
-            # Platform filter (App only) — applied early so non-matching apps skip
+            # Platform filter (App only) - applied early so non-matching apps skip
             # all downstream scope/filter resolution.
             if ($Platform -and $type.TypeName -eq 'App') {
                 $appPlatform = if ($policy.'@odata.type') { Resolve-LKAppPlatform -ODataType $policy.'@odata.type' } else { $null }
@@ -206,7 +206,7 @@ function Get-LKGroupAssignment {
             }
 
             if ($useExpand) {
-                # Assignments already came inline via $expand — no extra call.
+                # Assignments already came inline via $expand - no extra call.
                 $assignments = @($policy.assignments)
             } else {
                 try {

@@ -23,7 +23,7 @@ function Resolve-LKPolicyTypeById {
                 }
             }
         } catch {
-            # 404 or other error — not this type, try next
+            # 404 or other error - not this type, try next
             continue
         }
     }

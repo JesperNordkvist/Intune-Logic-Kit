@@ -69,7 +69,7 @@ Get-LKGroupAssignment -Name 'Pilot Devices' -NameMatch Exact
 - **Scope-aware** - automatic detection of user/device scope mismatches
 - **Policy comparison** - side-by-side setting diffs and conflict detection
 - **Device comparison** - detect drift in OS, apps, and configuration across devices
-- **Export** - export policies and settings to JSON or CSV, or download Intune reports (devices, compliance, proactive remediations, platform scripts) straight to CSV — the same reports as the portal's Export button
+- **Export** - export policies and settings to JSON or CSV, or download Intune reports (devices, compliance, proactive remediations, platform scripts) straight to CSV - the same reports as the portal's Export button
 - **Tab completion** - auto-complete policy and group names after connecting
 - **Safe by default** - all write operations support `-WhatIf` and `-Confirm`
 - **App intent support** - Required, Available, and Uninstall for app assignments

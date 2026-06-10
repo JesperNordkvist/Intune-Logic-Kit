@@ -50,7 +50,7 @@ $script:LKReportTypes = @(
         AcceptsPipeline   = 'Remediation'
     }
 
-    # --- Platform scripts (direct endpoint — no exportJob report) ---
+    # --- Platform scripts (direct endpoint - no exportJob report) ---
     @{
         Name            = 'PlatformScript'
         DisplayName     = 'Platform script device run states'

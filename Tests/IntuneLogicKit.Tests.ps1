@@ -603,7 +603,7 @@ Describe 'Get-LKGroupAssignment: bulk app assignment fetch (issue #15)' {
         Mock Get-LKGroup      -ModuleName IntuneLogicKit {
             @( [pscustomobject]@{ Id = 'd1'; Name = 'SG-Intune-D-Pilot Devices' } )
         }
-        # Single-name Exact routes through Resolve-LKGroupId — mock it so the
+        # Single-name Exact routes through Resolve-LKGroupId - mock it so the
         # Invoke-LKGraphRequest mock below is used only for the policy fetch.
         Mock Resolve-LKGroupId    -ModuleName IntuneLogicKit { 'd1' }
         Mock Resolve-LKGroupScope -ModuleName IntuneLogicKit { 'Device' }
@@ -676,7 +676,7 @@ Describe 'Resolve-LKAppPlatform: @odata.type -> platform (issue #14)' {
         @{ ODataType = '#microsoft.graph.iosStoreApp';                Expected = 'iOS' }
         @{ ODataType = '#microsoft.graph.iosVppApp';                  Expected = 'iOS' }
         @{ ODataType = '#microsoft.graph.managedIOSStoreApp';         Expected = 'iOS' }
-        # macOS — must win over shared keywords (Office/Edge/VPP)
+        # macOS - must win over shared keywords (Office/Edge/VPP)
         @{ ODataType = '#microsoft.graph.macOSDmgApp';                Expected = 'macOS' }
         @{ ODataType = '#microsoft.graph.macOSOfficeSuiteApp';        Expected = 'macOS' }
         @{ ODataType = '#microsoft.graph.macOSMicrosoftEdgeApp';      Expected = 'macOS' }

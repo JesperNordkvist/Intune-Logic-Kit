@@ -4,7 +4,7 @@ function Export-LKReportFromDirectEndpoint {
         Fetches data from a direct Graph endpoint (no exportJobs) and writes it to CSV.
     .DESCRIPTION
         Internal helper used by Export-LKReport for report types that don't have an
-        exportJobs report name — currently platform script run states.
+        exportJobs report name - currently platform script run states.
     #>
     [CmdletBinding()]
     param(

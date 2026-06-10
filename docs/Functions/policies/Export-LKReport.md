@@ -5,7 +5,7 @@ nav_order: 8
 
 # Export-LKReport
 
-Exports an Intune report to CSV — the same reports you get from the Intune portal's "Export" button.
+Exports an Intune report to CSV - the same reports you get from the Intune portal's "Export" button.
 
 ## Syntax
 
@@ -37,13 +37,13 @@ Export-LKReport
     [<CommonParameters>]
 ```
 
-You must supply at least one of `-ReportType`, `-PolicyName`, `-PolicyId`, `-AppName`, or `-AppId` — or pipe a policy from `Get-LKPolicy`.
+You must supply at least one of `-ReportType`, `-PolicyName`, `-PolicyId`, `-AppName`, or `-AppId` - or pipe a policy from `Get-LKPolicy`.
 
 ## Description
 
 Submits a Microsoft Graph `/deviceManagement/reports/exportJobs` request, polls until completion, downloads the resulting ZIP, and extracts the CSV to the destination path. This is the same mechanism the Intune portal uses behind the **Export** button in report views.
 
-Platform script device run states don't have an `exportJobs` report — those are fetched directly from `/deviceManagement/deviceManagementScripts/{id}/deviceRunStates` and flattened to CSV.
+Platform script device run states don't have an `exportJobs` report - those are fetched directly from `/deviceManagement/deviceManagementScripts/{id}/deviceRunStates` and flattened to CSV.
 
 `-ReportType` is **optional**. If you supply `-PolicyName` or `-PolicyId` instead, the cmdlet looks the policy up across the reportable types (Remediation, PlatformScript, App) and picks the right report on its own:
 
@@ -61,7 +61,7 @@ If multiple policies are piped, `-Path` is treated as a directory and one CSV is
 
 ### -ReportType
 
-The report to export. Optional — if omitted, it's inferred from `-PolicyName`, `-PolicyId`, `-AppName`, or `-AppId`. Required only for tenant-wide reports that don't tie to a single policy (`Devices`, `DeviceCompliance`, `ActiveMalware`, etc.).
+The report to export. Optional - if omitted, it's inferred from `-PolicyName`, `-PolicyId`, `-AppName`, or `-AppId`. Required only for tenant-wide reports that don't tie to a single policy (`Devices`, `DeviceCompliance`, `ActiveMalware`, etc.).
 
 | Attribute | Value |
 |---|---|
@@ -169,7 +169,7 @@ Emits an object describing each exported report (`ReportType`, `Label`, `Path`, 
 
 ## Examples
 
-### Example 1 — Just give it a policy name
+### Example 1 - Just give it a policy name
 
 ```powershell
 Export-LKReport -PolicyName "Check BitLocker" -Path .\pr.csv
@@ -177,7 +177,7 @@ Export-LKReport -PolicyName "Check BitLocker" -Path .\pr.csv
 
 The cmdlet looks up "Check BitLocker", sees it's a proactive remediation, and exports the `ProactiveRemediation` report. No `-ReportType` needed.
 
-### Example 2 — Same idea for a platform script
+### Example 2 - Same idea for a platform script
 
 ```powershell
 Export-LKReport -PolicyName "Install Agent" -Path .\script.csv
@@ -185,7 +185,7 @@ Export-LKReport -PolicyName "Install Agent" -Path .\script.csv
 
 Resolves to a platform script and uses the direct `/deviceRunStates` endpoint.
 
-### Example 3 — By policy ID
+### Example 3 - By policy ID
 
 ```powershell
 Export-LKReport -PolicyId "abcd1234-..." -Path .\out.csv
@@ -193,7 +193,7 @@ Export-LKReport -PolicyId "abcd1234-..." -Path .\out.csv
 
 Probes the remediation, platform script, and app endpoints to find the policy and pick the right report.
 
-### Example 4 — Tenant-wide reports (no policy)
+### Example 4 - Tenant-wide reports (no policy)
 
 ```powershell
 Export-LKReport -ReportType Devices -Path .\devices.csv
@@ -203,7 +203,7 @@ Export-LKReport -ReportType ActiveMalware -Path .\malware.csv
 
 These reports don't tie to a single policy, so `-ReportType` is required.
 
-### Example 5 — Disambiguate when names collide
+### Example 5 - Disambiguate when names collide
 
 ```powershell
 Export-LKReport -ReportType ProactiveRemediation -PolicyName "Check BitLocker" -Path .\pr.csv
@@ -211,7 +211,7 @@ Export-LKReport -ReportType ProactiveRemediation -PolicyName "Check BitLocker" -
 
 Useful only if the same name exists across multiple policy types (e.g. a platform script *and* a remediation called "Check BitLocker").
 
-### Example 6 — Pipeline from Get-LKPolicy
+### Example 6 - Pipeline from Get-LKPolicy
 
 ```powershell
 Get-LKPolicy -PolicyType Remediation -Name "Check BitLocker" | Export-LKReport -Path .\pr.csv
@@ -219,7 +219,7 @@ Get-LKPolicy -PolicyType Remediation -Name "Check BitLocker" | Export-LKReport -
 
 Equivalent to Example 1 but lets you preview the policy first.
 
-### Example 7 — Export every remediation into a folder
+### Example 7 - Export every remediation into a folder
 
 ```powershell
 Get-LKPolicy -PolicyType Remediation | Export-LKReport -Path .\remediations\
@@ -227,7 +227,7 @@ Get-LKPolicy -PolicyType Remediation | Export-LKReport -Path .\remediations\
 
 When multiple policies are piped, `-Path` becomes a directory and one CSV is written per policy.
 
-### Example 8 — Per-user app install status
+### Example 8 - Per-user app install status
 
 ```powershell
 Export-LKReport -ReportType AppInstallStatusByUser -AppName "Company Portal" -Path .\cp-by-user.csv
@@ -235,13 +235,13 @@ Export-LKReport -ReportType AppInstallStatusByUser -AppName "Company Portal" -Pa
 
 `AppInstallStatus` is the default for app inference; use `-ReportType` explicitly when you want the per-user variant instead.
 
-### Example 9 — Raw OData filter override
+### Example 9 - Raw OData filter override
 
 ```powershell
 Export-LKReport -ReportType Devices -Filter "(OwnerType eq 'company')" -Path .\corp-devices.csv
 ```
 
-### Example 10 — Get the file info back for further processing
+### Example 10 - Get the file info back for further processing
 
 ```powershell
 $report = Export-LKReport -ReportType DeviceCompliance -Path .\compliance.csv -PassThru
@@ -268,6 +268,6 @@ Writes the CSV to `-Path`. With `-PassThru`, emits one object per exported repor
 
 ## Related
 
-- [Export-LKPolicy](Export-LKPolicy.md) — export policies and settings
-- [Get-LKPolicy](Get-LKPolicy.md) — feeds the pipeline path
-- [Get-LKDevice](../devices/Get-LKDevice.md) — query devices directly without an export job
+- [Export-LKPolicy](Export-LKPolicy.md) - export policies and settings
+- [Get-LKPolicy](Get-LKPolicy.md) - feeds the pipeline path
+- [Get-LKDevice](../devices/Get-LKDevice.md) - query devices directly without an export job

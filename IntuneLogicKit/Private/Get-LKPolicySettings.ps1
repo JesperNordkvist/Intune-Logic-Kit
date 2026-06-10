@@ -60,7 +60,7 @@ function Get-LKSettingsCatalogSettings {
     [CmdletBinding()]
     param([string]$PolicyId)
 
-    # Fetch settings with expanded definitions in one call — gives us displayName and option labels
+    # Fetch settings with expanded definitions in one call - gives us displayName and option labels
     try {
         $settings = Invoke-LKGraphRequest -Method GET `
             -Uri "/deviceManagement/configurationPolicies/$PolicyId/settings?`$expand=settingDefinitions" `

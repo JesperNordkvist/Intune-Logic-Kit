@@ -19,7 +19,7 @@ function Resolve-LKAppPlatform {
     )
 
     switch -Wildcard ($ODataType) {
-        # macOS — check first (macOS Edge/Office/VPP/Defender share keywords with Windows)
+        # macOS - check first (macOS Edge/Office/VPP/Defender share keywords with Windows)
         '*macOS*'                       { return 'macOS' }
 
         # iOS
@@ -37,7 +37,7 @@ function Resolve-LKAppPlatform {
         '*managedAndroidLobApp'         { return 'Android' }
         '*androidForWorkApp'            { return 'Android' }
 
-        # Windows — including windowsWebApp (caught before the generic webApp below)
+        # Windows - including windowsWebApp (caught before the generic webApp below)
         '*win32LobApp'                  { return 'Windows' }
         '*win32CatalogApp'              { return 'Windows' }
         '*windowsMobileMSI'             { return 'Windows' }
@@ -50,7 +50,7 @@ function Resolve-LKAppPlatform {
         '*windowsUniversalAppX'         { return 'Windows' }
         '*windowsPhone*'                { return 'Windows' }
 
-        # Web (generic web link/clip — windowsWebApp already handled above)
+        # Web (generic web link/clip - windowsWebApp already handled above)
         '*webApp'                       { return 'Web' }
 
         default                         { return $null }

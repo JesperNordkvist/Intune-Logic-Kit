@@ -39,7 +39,7 @@ function Resolve-LKGroupScopeTransitive {
             $result.Scope = 'User'
             return $result
         }
-        # Rule doesn't clearly indicate scope — fall through to member check
+        # Rule doesn't clearly indicate scope - fall through to member check
     }
 
     # Assigned/unclear group: enumerate transitive members
@@ -58,7 +58,7 @@ function Resolve-LKGroupScopeTransitive {
                     $odataType = $member.'@odata.type'
                     if ($odataType -like '*device*') { $deviceCount++ }
                     elseif ($odataType -like '*user*') { $userCount++ }
-                    # Skip #microsoft.graph.group — transitive already flattens nested groups
+                    # Skip #microsoft.graph.group - transitive already flattens nested groups
                 }
             }
 

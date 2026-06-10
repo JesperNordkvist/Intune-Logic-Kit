@@ -239,7 +239,7 @@ function Export-LKReport {
         foreach ($job in $jobs) {
             $reportEntry = $script:LKReportTypes | Where-Object { $_.Name -eq $job.ReportType }
             if (-not $reportEntry) {
-                Write-Warning "Unknown report type '$($job.ReportType)' — skipping."
+                Write-Warning "Unknown report type '$($job.ReportType)' - skipping."
                 continue
             }
 

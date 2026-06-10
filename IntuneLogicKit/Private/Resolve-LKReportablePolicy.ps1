@@ -37,7 +37,7 @@ function Resolve-LKReportablePolicy {
                     -Uri "$($typeEntry.Endpoint)/$PolicyId" `
                     -ApiVersion $typeEntry.ApiVersion
             } catch {
-                # 404 / not this type — try next
+                # 404 / not this type - try next
                 continue
             }
 
