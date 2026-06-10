@@ -37,7 +37,7 @@ function Add-LKGroupMember {
     )
 
     begin {
-        Assert-LKSession
+        Assert-LKSession -RequireWrite
         $groupId = Resolve-LKGroupId -GroupName $GroupName
     }
 

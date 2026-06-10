@@ -19,7 +19,7 @@ function Rename-LKGroup {
         [string]$NewName
     )
 
-    Assert-LKSession
+    Assert-LKSession -RequireWrite
 
     $id = if ($PSCmdlet.ParameterSetName -eq 'ByName') {
         Resolve-LKGroupId -GroupName $Name

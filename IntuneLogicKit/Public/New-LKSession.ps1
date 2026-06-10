@@ -9,11 +9,23 @@ function New-LKSession {
 
         If a previous session was established against a different tenant or account,
         a warning is shown so you don't accidentally work in the wrong environment.
+    .PARAMETER ReadOnly
+        Connect with read-only Graph scopes only. The sign-in consents to no
+        ReadWrite permissions, and any mutating LK command (Add-/Remove-/Rename-/
+        New-/Copy-LKPolicyAssignment, group edits, device actions, …) refuses with
+        a clear message. Use for auditing or in tenants that won't grant write access.
     .EXAMPLE
         New-LKSession
+    .EXAMPLE
+        New-LKSession -ReadOnly
+        Connects for auditing only — no write scopes are requested or usable.
     #>
     [CmdletBinding()]
-    param ()
+    param (
+        [switch]$ReadOnly
+    )
+
+    $requestedScopes = if ($ReadOnly) { $script:LKReadOnlyScopes } else { $script:LKRequiredScopes }
 
     # Install the Graph auth module if missing
     if (-not (Get-Module -ListAvailable -Name Microsoft.Graph.Authentication)) {
@@ -30,7 +42,7 @@ function New-LKSession {
     # -ContextScope Process keeps the Graph token cache in-memory for this
     # PowerShell session only. The shared on-disk MSAL cache can fall out of
     # sync (especially in cross-tenant scenarios) and re-prompt on every call.
-    Connect-MgGraph -Scopes $script:LKRequiredScopes -ContextScope Process -NoWelcome -ErrorAction Stop
+    Connect-MgGraph -Scopes $requestedScopes -ContextScope Process -NoWelcome -ErrorAction Stop
 
     $context = Get-MgContext
 
@@ -51,7 +63,7 @@ function New-LKSession {
 
     # Validate that all required scopes were granted
     $grantedScopes = $context.Scopes
-    $missingScopes = @($script:LKRequiredScopes | Where-Object { $_ -notin $grantedScopes })
+    $missingScopes = @($requestedScopes | Where-Object { $_ -notin $grantedScopes })
     if ($missingScopes.Count -gt 0) {
         Write-Warning "The following scopes were not granted (admin consent may be required):"
         $missingScopes | ForEach-Object { Write-Warning "  - $_" }
@@ -64,7 +76,12 @@ function New-LKSession {
         TenantName  = $org.displayName
         Account     = $context.Account
         Scopes      = $grantedScopes
+        ReadOnly    = [bool]$ReadOnly
         ConnectedAt = [datetime]::Now
+    }
+
+    if ($ReadOnly) {
+        Write-Host 'Connected in read-only mode — write commands are disabled for this session.' -ForegroundColor DarkYellow
     }
 
     # Persist session reference for the tenant/account guardrail
@@ -84,6 +101,7 @@ function New-LKSession {
         TenantName  = $script:LKSession.TenantName
         TenantId    = $script:LKSession.TenantId
         Account     = $script:LKSession.Account
+        ReadOnly    = $script:LKSession.ReadOnly
         ConnectedAt = $script:LKSession.ConnectedAt
     }
 

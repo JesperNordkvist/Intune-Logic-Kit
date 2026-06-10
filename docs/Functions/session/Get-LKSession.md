@@ -29,6 +29,7 @@ This command has no parameters.
 | TenantId | String | Tenant GUID |
 | Account | String | Signed-in user's UPN |
 | Scopes | String[] | Active Graph permission scopes |
+| ReadOnly | Boolean | True when connected with `-ReadOnly` |
 | ConnectedAt | DateTime | When the session was established |
 
 ## Examples

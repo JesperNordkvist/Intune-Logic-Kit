@@ -37,7 +37,7 @@ function Copy-LKPolicyAssignment {
         [string]$AssignmentType = 'Include'
     )
 
-    Assert-LKSession
+    Assert-LKSession -RequireWrite
 
     # Resolve target group upfront so we fail fast if it doesn't exist
     $targetGroupId = Resolve-LKGroupId -GroupName $TargetGroup

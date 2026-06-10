@@ -30,7 +30,7 @@ function Rename-LKPolicy {
     )
 
     begin {
-        Assert-LKSession
+        Assert-LKSession -RequireWrite
     }
 
     process {

@@ -25,6 +25,7 @@ function Get-LKSession {
         TenantId    = $script:LKSession.TenantId
         Account     = $script:LKSession.Account
         Scopes      = $script:LKSession.Scopes
+        ReadOnly    = $script:LKSession.ReadOnly
         ConnectedAt = $script:LKSession.ConnectedAt
     }
 }

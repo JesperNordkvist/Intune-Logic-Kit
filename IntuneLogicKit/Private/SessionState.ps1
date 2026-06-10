@@ -4,6 +4,7 @@ $script:LKSession = @{
     TenantName  = $null
     Account     = $null
     Scopes      = @()
+    ReadOnly    = $false
     ConnectedAt = $null
 }
 
@@ -21,5 +22,16 @@ $script:LKRequiredScopes = @(
     'DeviceManagementApps.ReadWrite.All'
     'DeviceManagementServiceConfig.ReadWrite.All'
     'DeviceManagementRBAC.ReadWrite.All'
+    'Organization.Read.All'
+)
+
+# Read-only counterpart requested by New-LKSession -ReadOnly. Consents to no
+# write scopes, so locked-down tenants can audit without granting ReadWrite.
+$script:LKReadOnlyScopes = @(
+    'DeviceManagementConfiguration.Read.All'
+    'DeviceManagementManagedDevices.Read.All'
+    'DeviceManagementApps.Read.All'
+    'DeviceManagementServiceConfig.Read.All'
+    'DeviceManagementRBAC.Read.All'
     'Organization.Read.All'
 )

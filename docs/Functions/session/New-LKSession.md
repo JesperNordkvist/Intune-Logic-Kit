@@ -10,7 +10,7 @@ Opens an interactive login and connects to Microsoft Graph for Intune administra
 ## Syntax
 
 ```text
-New-LKSession [<CommonParameters>]
+New-LKSession [-ReadOnly] [<CommonParameters>]
 ```
 
 ## Description
@@ -21,7 +21,14 @@ If a previous session was established against a different tenant or account, a w
 
 ## Parameters
 
-This command has no parameters.
+### -ReadOnly
+
+Connect with read-only Graph scopes only. The sign-in consents to no `*.ReadWrite.All` permissions, so the module can be used for auditing in tenants that won't grant write access. Any mutating LK command (`Add-`/`Remove-`/`Rename-`/`New-`/`Copy-LKPolicyAssignment`, group edits, device actions, …) refuses with a clear message while the session is read-only.
+
+| Attribute | Value |
+|---|---|
+| Type | `SwitchParameter` |
+| Required | No |
 
 ## Outputs
 
@@ -30,6 +37,7 @@ This command has no parameters.
 | TenantName | String | Display name of the connected tenant |
 | TenantId | String | Tenant GUID |
 | Account | String | Signed-in user's UPN |
+| ReadOnly | Boolean | True when connected with `-ReadOnly` |
 | ConnectedAt | DateTime | When the session was established |
 
 ## Notes
@@ -43,6 +51,14 @@ After connecting, the module automatically checks GitHub for a newer release. If
 ```powershell
 New-LKSession
 ```
+
+### Example 2 - Connect for auditing only (read-only)
+
+```powershell
+New-LKSession -ReadOnly
+```
+
+No write scopes are requested, and write commands are disabled for the session.
 
 ## Related
 

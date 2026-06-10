@@ -30,7 +30,7 @@ function Invoke-LKDeviceAction {
     )
 
     begin {
-        Assert-LKSession
+        Assert-LKSession -RequireWrite
 
         $actionMap = @{
             'Sync'       = 'syncDevice'

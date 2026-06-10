@@ -170,6 +170,78 @@ Describe 'Functions requiring session should throw without one' {
     }
 }
 
+Describe 'Read-only session (issue #13)' {
+    BeforeAll {
+        $module = Get-Module IntuneLogicKit
+    }
+
+    Context 'Read-only scope set' {
+        It 'Defines a read-only scope set' {
+            $ro = & $module { $script:LKReadOnlyScopes }
+            $ro | Should -Not -BeNullOrEmpty
+        }
+        It 'Requests no ReadWrite scopes' {
+            $ro = & $module { $script:LKReadOnlyScopes }
+            @($ro | Where-Object { $_ -like '*ReadWrite*' }) | Should -BeNullOrEmpty
+        }
+        It 'Covers the same number of services as the write scope set' {
+            $rw = & $module { $script:LKRequiredScopes }
+            $ro = & $module { $script:LKReadOnlyScopes }
+            $ro.Count | Should -Be $rw.Count
+        }
+    }
+
+    Context 'Assert-LKSession -RequireWrite' {
+        AfterEach {
+            InModuleScope IntuneLogicKit { $script:LKSession.Connected = $false; $script:LKSession.ReadOnly = $false }
+        }
+
+        It 'Throws on a read-only session' {
+            InModuleScope IntuneLogicKit {
+                Mock Get-MgContext { @{ TenantId = 't1'; Account = 'a1' } }
+                $script:LKSession = @{ Connected = $true; TenantId = 't1'; TenantName = 'T'; Account = 'a1'; ReadOnly = $true }
+                { Assert-LKSession -RequireWrite } | Should -Throw '*read-only*'
+            }
+        }
+
+        It 'Permits reads on a read-only session' {
+            InModuleScope IntuneLogicKit {
+                Mock Get-MgContext { @{ TenantId = 't1'; Account = 'a1' } }
+                $script:LKSession = @{ Connected = $true; TenantId = 't1'; TenantName = 'T'; Account = 'a1'; ReadOnly = $true }
+                { Assert-LKSession } | Should -Not -Throw
+            }
+        }
+
+        It 'Permits writes on a normal session' {
+            InModuleScope IntuneLogicKit {
+                Mock Get-MgContext { @{ TenantId = 't1'; Account = 'a1' } }
+                $script:LKSession = @{ Connected = $true; TenantId = 't1'; TenantName = 'T'; Account = 'a1'; ReadOnly = $false }
+                { Assert-LKSession -RequireWrite } | Should -Not -Throw
+            }
+        }
+    }
+
+    Context 'Every Graph-mutating command is guarded' {
+        It '<Command> calls Assert-LKSession -RequireWrite' -TestCases @(
+            @{ Command = 'Add-LKPolicyAssignment' }
+            @{ Command = 'Remove-LKPolicyAssignment' }
+            @{ Command = 'Add-LKPolicyExclusion' }
+            @{ Command = 'Remove-LKPolicyExclusion' }
+            @{ Command = 'Copy-LKPolicyAssignment' }
+            @{ Command = 'Rename-LKPolicy' }
+            @{ Command = 'New-LKGroup' }
+            @{ Command = 'Remove-LKGroup' }
+            @{ Command = 'Rename-LKGroup' }
+            @{ Command = 'Add-LKGroupMember' }
+            @{ Command = 'Remove-LKGroupMember' }
+            @{ Command = 'Invoke-LKDeviceAction' }
+        ) {
+            param($Command)
+            (Get-Command $Command).Definition | Should -BeLike '*Assert-LKSession -RequireWrite*'
+        }
+    }
+}
+
 Describe 'Resolve-LKGroupScope: empty assigned group fallback (issue #5)' {
     # Regression coverage for issue #5. An assigned (non-dynamic) group with no
     # members must still resolve its scope from the U/D/C tokens in its display

@@ -55,7 +55,7 @@ function Remove-LKPolicyAssignment {
     )
 
     begin {
-        Assert-LKSession
+        Assert-LKSession -RequireWrite
 
         # Exactly one assignment target must be specified.
         $targetChoices = @()

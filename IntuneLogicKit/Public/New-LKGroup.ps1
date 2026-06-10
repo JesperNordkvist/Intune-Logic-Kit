@@ -37,7 +37,7 @@ function New-LKGroup {
         [string]$MembershipRuleProcessingState = 'On'
     )
 
-    Assert-LKSession
+    Assert-LKSession -RequireWrite
 
     # Validate -GroupType / -MembershipRule combination
     if ($GroupType -eq 'Dynamic' -and -not $MembershipRule) {
